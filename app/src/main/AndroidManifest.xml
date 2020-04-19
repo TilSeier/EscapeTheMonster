@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tilseier.escapethemonster">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.tilseier.escapethemonster"
+    tools:ignore="LockedOrientationActivity">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -12,8 +14,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!--TODO REMOVE SPLASH-->
         <activity
-            android:name=".SplashActivity"
+            android:name=".screens.SplashActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".screens.MainActivity"
+            android:theme="@style/SplashTheme"
+            android:launchMode="singleTask"
             android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,10 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="fullSensor" />
     </application>
 
 </manifest>

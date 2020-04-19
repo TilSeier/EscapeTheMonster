@@ -2,10 +2,9 @@ package com.tilseier.escapethemonster.utils.helper.shared
 
 import android.content.SharedPreferences
 import com.tilseier.escapethemonster.utils.Const
+import javax.inject.Inject
 
-//@Inject
-
-class SharedPreferencesHelperImpl  constructor(val sharedPreferences: SharedPreferences) :
+class SharedPreferencesHelperImpl @Inject constructor(val sharedPreferences: SharedPreferences) :
     SharedPreferencesHelper {
     override fun getLanguage(): String? {
         return sharedPreferences.getString(Const.KEY_LANGUAGE, "EN")

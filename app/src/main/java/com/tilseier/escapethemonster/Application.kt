@@ -16,7 +16,7 @@ class Application: Application() {
 
     private fun initializeInjector() {
         applicationComponent = DaggerApplicationComponent.builder()
-//            .applicationModule(ApplicationModule())
+            .applicationModule(ApplicationModule(this))
             .build()
     }
 
