@@ -1,5 +1,6 @@
 package com.tilseier.escapethemonster.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,14 @@ import androidx.navigation.Navigation
 abstract class BaseFragment: Fragment() {
 
     protected lateinit var navController: NavController
+    protected var myContext: Context? = null
     private var toast: Toast? = null
+
+    //Attach context to avoid context null on orientation change
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        this.myContext = context
+    }
 
     /**
      * Shows a [Toast] message.
@@ -20,7 +28,7 @@ abstract class BaseFragment: Fragment() {
      * @param message An string representing a message to be shown.
      */
     protected open fun showToastMessage(message: String?) {
-        toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT)
+        toast = myContext?.let { Toast.makeText(it, message, Toast.LENGTH_SHORT) }//Toast.makeText(activity, message, Toast.LENGTH_SHORT)// activity?.let { Toast.makeText(it, message, Toast.LENGTH_SHORT) }
         toast?.show()
     }
 

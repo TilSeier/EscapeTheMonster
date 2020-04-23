@@ -37,6 +37,7 @@ class LevelsRepository {
 
     private fun setLevels() {
         levels = mutableListOf(
+            //1 - 9 levels
             Level(1, listOf(
                 Place("", true),
                 Place("", false),
@@ -82,6 +83,7 @@ class LevelsRepository {
                 Place("", true),
                 Place("", false)
             ), false, 2),
+            //10 - 18 levels
             Level(10, listOf(
                 Place("", true),
                 Place("", false),
@@ -126,6 +128,52 @@ class LevelsRepository {
                 Place("", false),
                 Place("", true),
                 Place("", true)
+            ), false, 1),
+            //19 - 27 levels
+            Level(19, listOf(
+                Place("", true),
+                Place("", false),
+                Place("", false)
+            ), false, 7),
+            Level(20, listOf(
+                Place("", true),
+                Place("", false),
+                Place("", true)
+            ), false, 1),
+            Level(21, listOf(
+                Place("", true),
+                Place("", false),
+                Place("", true)
+            ), false, 1),
+            Level(22, listOf(
+                Place("", true),
+                Place("", true),
+                Place("", false)
+            ), false, 3),
+            Level(23, listOf(
+                Place("", true),
+                Place("", true),
+                Place("", false)
+            ), false, 2),
+            Level(24, listOf(
+                Place("", false),
+                Place("", false),
+                Place("", true)
+            ), false, 3),
+            Level(25, listOf(
+                Place("", false),
+                Place("", false),
+                Place("", true)
+            ), false, 3),
+            Level(26, listOf(
+                Place("", true),
+                Place("", false),
+                Place("", false)
+            ), false, 2),
+            Level(27, listOf(
+                Place("", false),
+                Place("", true),
+                Place("", true)
             ), false, 1)
         )
 
@@ -133,6 +181,7 @@ class LevelsRepository {
         //TODO SEPARATE ON PAGES PROPERLY
         levelsPages.add(levels.subList(0, 9))
         levelsPages.add(levels.subList(9, 18))
+        levelsPages.add(levels.subList(18, 27))
     }
 
 }

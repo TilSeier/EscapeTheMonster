@@ -8,8 +8,18 @@ import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.models.Level
 import kotlinx.android.synthetic.main.level_item.view.*
 
-class LevelsRecycleAdapter constructor(var levels: List<Level>) : RecyclerView.Adapter<LevelsRecycleAdapter.LevelItemViewHolder>() {
+class LevelsRecycleAdapter constructor(var levels: List<Level>) :
+    RecyclerView.Adapter<LevelsRecycleAdapter.LevelItemViewHolder>() {
 
+    interface LevelClickListener {
+        fun onLevelClick(level: Level)
+    }
+
+    private var levelsListener: LevelClickListener? = null
+
+    fun setOnLevelClickListener(levelsListener: LevelClickListener) {
+        this.levelsListener = levelsListener
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -21,16 +31,21 @@ class LevelsRecycleAdapter constructor(var levels: List<Level>) : RecyclerView.A
     }
 
     override fun getItemCount(): Int {
-        return levels.size ?: 0
+        return levels.size
     }
 
     override fun onBindViewHolder(holder: LevelItemViewHolder, position: Int) {
         val viewHolder: LevelItemViewHolder = holder
         viewHolder.bind(levels[viewHolder.adapterPosition])
+        viewHolder.levelBox.setOnClickListener {
+            levelsListener?.onLevelClick(levels[viewHolder.adapterPosition])
+        }
     }
 
     class LevelItemViewHolder internal constructor(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
+
+        val levelBox = itemView.level_box
 
         fun bind(images: Level) {
             itemView.tv_level.text = images.level.toString()
