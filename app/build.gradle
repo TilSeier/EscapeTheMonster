@@ -59,7 +59,7 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.9.0'
 
     //Gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     //MVVM Clean Architecture
 

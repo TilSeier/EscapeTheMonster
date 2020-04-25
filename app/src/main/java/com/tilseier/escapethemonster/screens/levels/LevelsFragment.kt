@@ -34,11 +34,14 @@ class LevelsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLevelsViewModel?.getLevelsPages()?.observe(viewLifecycleOwner) { levels ->
-            Log.e("LevelsFragment", "LEVEL PAGES: ${levels?.size}")
+        mLevelsViewModel?.getLevelsPages()?.observe(viewLifecycleOwner, Observer {
+            Log.e("LevelsFragment", "LEVEL PAGES: ${it?.size}")
             //setup levels
-            setupLevels(levels)
-        }
+            setupLevels(it)
+        })
+
+//        observe(viewLifecycleOwner
+
         mLevelsViewModel?.navigateToLevel()?.observe(viewLifecycleOwner, Observer {
             // Only proceed if the event has never been handled
             it.getEventIfNotHandled()?.let {
