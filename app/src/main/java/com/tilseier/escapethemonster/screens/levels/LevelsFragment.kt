@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.base.BaseFragment
@@ -33,18 +34,18 @@ class LevelsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLevelsViewModel?.setMoveNext(false)
         mLevelsViewModel?.getLevelsPages()?.observe(viewLifecycleOwner) { levels ->
             Log.e("LevelsFragment", "LEVEL PAGES: ${levels?.size}")
             //setup levels
             setupLevels(levels)
         }
-        mLevelsViewModel?.getMoveNext()?.observe(viewLifecycleOwner) { move ->
-            Log.e("LevelsFragment", "move: $move")
-            if (move) {
+        mLevelsViewModel?.navigateToLevel()?.observe(viewLifecycleOwner, Observer {
+            // Only proceed if the event has never been handled
+            it.getEventIfNotHandled()?.let {
+                mLevelsViewModel?.setSelectedLevel(it)
                 navController.navigate(R.id.action_levelsFragment_to_gameFragment)
             }
-        }
+        })
 //        mLevelsViewModel?.let { lifecycle.addObserver(it) }//TODO DECIDE DO WE NEED IT? //CAUSE ERROR Android lifecycle library: Cannot add the same observer with different lifecycles GameFragment: 32
 
         btn_back.setOnClickListener {

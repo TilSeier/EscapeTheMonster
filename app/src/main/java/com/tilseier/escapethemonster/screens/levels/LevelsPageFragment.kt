@@ -53,8 +53,7 @@ class LevelsPageFragment : BaseFragment() {
         object : LevelsRecycleAdapter.LevelClickListener {
             override fun onLevelClick(level: Level) {
                 Log.e("LevelsPageFragment", "LevelsRecycleAdapter.LevelClickListener onLevelClick ${level.level}")
-                mLevelsViewModel?.setSelectedLevel(level)
-                mLevelsViewModel?.setMoveNext(true)
+                mLevelsViewModel?.userClickOnLevel(level)
             }
         }
 

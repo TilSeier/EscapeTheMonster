@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.tilseier.escapethemonster.models.Level
 import com.tilseier.escapethemonster.screens.levels.LevelsRepository
+import com.tilseier.escapethemonster.utils.Event
 
 
 class LevelsViewModel: ViewModel() {
@@ -15,7 +16,7 @@ class LevelsViewModel: ViewModel() {
     private var mLevelsPages: MutableLiveData<List<List<Level>>>? = null
     private var mRepo: LevelsRepository? = null
     private var mSelectedLevel: MutableLiveData<Level> = MutableLiveData<Level>()
-    private var mMoveNext: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    private var _navigateToLevel: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
 
     init {
         if (mLevels == null) {
@@ -28,28 +29,20 @@ class LevelsViewModel: ViewModel() {
         }
     }
 
-    fun getLevels(): LiveData<List<Level>>? {
-        return mLevels
-    }
+    fun getLevels(): LiveData<List<Level>>? = mLevels
 
-    fun getLevelsPages(): LiveData<List<List<Level>>>? {
-        return mLevelsPages
-    }
+    fun getLevelsPages(): LiveData<List<List<Level>>>? = mLevelsPages
 
-    fun getSelectedLevel(): LiveData<Level>{
-        return mSelectedLevel
-    }
+    fun getSelectedLevel(): LiveData<Level> = mSelectedLevel
+
+    fun navigateToLevel(): LiveData<Event<Level>> = _navigateToLevel
 
     fun setSelectedLevel(level: Level?){
         mSelectedLevel.value = level
     }
 
-    fun getMoveNext(): LiveData<Boolean>{
-        return mMoveNext
-    }
-
-    fun setMoveNext(move: Boolean){
-        mMoveNext.value = move
+    fun userClickOnLevel(level: Level){
+        _navigateToLevel.value = Event(level)
     }
 
 //    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
