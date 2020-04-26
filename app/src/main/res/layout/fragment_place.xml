@@ -7,10 +7,19 @@
     tools:context=".screens.menu.MenuFragment">
 
     <!-- TODO ImageView-->
-    <TextView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:background="@color/black"/>
+    <ImageView
+        android:id="@+id/iv_place"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrow_back"/>
+
+    <ImageView
+        android:id="@+id/iv_preload_place"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrow_back"/>
 
 </FrameLayout>

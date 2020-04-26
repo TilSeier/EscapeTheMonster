@@ -46,6 +46,7 @@ class LevelsFragment : BaseFragment() {
             // Only proceed if the event has never been handled
             it.getEventIfNotHandled()?.let {
                 mLevelsViewModel?.setSelectedLevel(it)
+                mLevelsViewModel?.startSelectedLevel()
                 navController.navigate(R.id.action_levelsFragment_to_gameFragment)
             }
         })

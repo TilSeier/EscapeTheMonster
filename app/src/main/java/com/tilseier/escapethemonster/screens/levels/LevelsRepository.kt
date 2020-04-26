@@ -39,58 +39,58 @@ class LevelsRepository {
         levels = mutableListOf(
             //1 - 9 levels
             Level(1, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
             ), listOf(
-                Place("", true),
-                Place("", true),
-                Place("", true)
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ), false, 2),
             Level(2, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
-            ),  listOf(
-                Place("", true),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
+            ), listOf(
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ),false, 1),
             Level(3, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
             ), listOf(
-                Place("", true),
-                Place("", true),
-                Place("", true)
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ), false, 0),
             Level(4, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
             ), listOf(
-                Place("", true),
-                Place("", true),
-                Place("", true)
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ), false, 3),
             Level(5, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
             ), listOf(
-                Place("", true),
-                Place("", true),
-                Place("", true)
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ), false, 5),
             Level(6, listOf(
-                Place("", false),
-                Place("", false),
-                Place("", false)
+                Place("https://d34ip4tojxno3w.cloudfront.net/app/uploads/Revontulet-j%C3%91rvell%C3%91-heijastus_ThomasKast-400x300.jpg", false),
+                Place("https://i.imgur.com/U4Oadyu.png", false),
+                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
             ), listOf(
-                Place("", true),
-                Place("", true),
-                Place("", true)
+                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
+                Place("https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg", true),
+                Place("https://greenparty.ua/wp-content/uploads/2020/04/1180606-400x300.jpg", true)
             ), false, 1),
             Level(7, listOf(
                 Place("", false),
