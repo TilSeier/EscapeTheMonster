@@ -22,11 +22,14 @@ import kotlinx.android.synthetic.main.fragment_game.*
 
 class GameFragment : BaseFragment() {
 
-    //TODO preload all place images before start level
+    //TODO preload all place images before start level +-
+
     //TODO view pager transformation
     //TODO progress with achievements// stars for level //achieve star1, star2, star3 position in Level model
     //TODO timer for places (true/false or float milliseconds) in Place model
     //TODO progress enhance
+
+    //TODO fix problem with slider images
 
     private var mLevelsViewModel: LevelsViewModel? = null
 

@@ -2,6 +2,7 @@ package com.tilseier.escapethemonster.screens
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.bumptech.glide.Glide
 import com.tilseier.escapethemonster.models.Level
 import com.tilseier.escapethemonster.models.PagerPlaces
 import com.tilseier.escapethemonster.models.PlaceState
@@ -20,6 +21,7 @@ class LevelsViewModel : ViewModel() {
     private var mLevelsPages: MutableLiveData<List<List<Level>>>? = null
     private var mRepo: LevelsRepository? = null
     private var _navigateToLevel: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
+    private var _prepareLevelImages: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
     private var _navigateToGameEnd: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goAhead: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goBack: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
@@ -59,6 +61,8 @@ class LevelsViewModel : ViewModel() {
 
     fun navigateToGameEnd(): LiveData<Event<Boolean>> = _navigateToGameEnd
 
+    fun prepareLevelImages(): LiveData<Event<Level>> = _prepareLevelImages
+
     fun goAhead(): LiveData<Event<Boolean>> = _goAhead
 
     fun goBack(): LiveData<Event<Boolean>> = _goBack
@@ -70,7 +74,7 @@ class LevelsViewModel : ViewModel() {
     //Game Level
     fun getPagerPlaces(): LiveData<PagerPlaces> = mCurrentPagerPlaces
 
-    fun startSelectedLevel() {
+    fun prepareStartSelectedLevel() {
         //TODO shuffle mechanism
 //        mSelectedLevel.value?.safePlaces?.let { mSelectedLevel.value?.levelPlaces?.addAll(it) }
 //        mSelectedLevel.value?.scaryPlaces?.let { mSelectedLevel.value?.levelPlaces?.addAll(it) }
@@ -82,6 +86,9 @@ class LevelsViewModel : ViewModel() {
 
         mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
         mPassedScaryPlaces.value = 0// mSelectedLevel.value?.passedScaryPlaces
+
+
+//        preloadLevelImages(mSelectedLevel.value)
 
 //        nextPlace()
     }
@@ -163,8 +170,12 @@ class LevelsViewModel : ViewModel() {
     }
 
     //Events
-    fun userClickOnLevel(level: Level) {
+    fun onLevelImagesReady(level: Level) {
         _navigateToLevel.value = Event(level)
+    }
+
+    fun userClickOnLevel(level: Level) {
+        _prepareLevelImages.value = Event(level)
     }
 
     private fun onGameEnd() {//level: Level//TODO
