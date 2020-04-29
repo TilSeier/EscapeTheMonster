@@ -6,4 +6,13 @@
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="gray">#838383</color>
+
+    <color name="disable_text">#E1E1E1</color>
+
+    <!--game buttons-->
+    <color name="btn_go_back_enabled">#6200EE</color>
+    <color name="btn_go_back_disabled">#acafb0</color>
+    <color name="btn_go_ahead_enabled">#03DAC5</color>
+    <color name="btn_go_ahead_disabled">#acafb0</color>
 </resources>

@@ -2,7 +2,6 @@ package com.tilseier.escapethemonster.screens
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.bumptech.glide.Glide
 import com.tilseier.escapethemonster.models.Level
 import com.tilseier.escapethemonster.models.PagerPlaces
 import com.tilseier.escapethemonster.models.PlaceState
@@ -25,6 +24,7 @@ class LevelsViewModel : ViewModel() {
     private var _navigateToGameEnd: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goAhead: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goBack: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
+    private var _enableUserInteraction: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
 
     //Game Level
     private var mSelectedLevel: MutableLiveData<Level> = MutableLiveData<Level>()
@@ -67,6 +67,8 @@ class LevelsViewModel : ViewModel() {
 
     fun goBack(): LiveData<Event<Boolean>> = _goBack
 
+    fun enableUserInteraction(): LiveData<Event<Boolean>> = _enableUserInteraction
+
     fun setSelectedLevel(level: Level?) {
         mSelectedLevel.value = level
     }
@@ -94,6 +96,9 @@ class LevelsViewModel : ViewModel() {
     }
 
     fun onPlaceGoAheadAnimationEnd() {
+        //TODO enable user interaction
+        _enableUserInteraction.value = Event(true)
+
         //TODO THIS COMMENTED CODE ONLY FORE SWIPE GAME
 //        if (mCurrentPagerPlaces.value?.nextPlace?.state == PlaceState.GAME_OVER_PLACE) {
 //            isGameOver = true
@@ -103,7 +108,31 @@ class LevelsViewModel : ViewModel() {
 //        }
 //
 //        if (!isGameWin || isGameOver) {
-            if (!isGameOver) {
+            if (!isGameOver) {//TODO mb move to on click
+                mSelectedLevel.value?.nextLevelPlace()
+            } else {
+                mSelectedLevel.value?.setGameOverPlaces()
+            }
+            mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
+//        } else {
+//            onGameEnd()
+//        }
+    }
+
+    fun onPlaceGoBackAnimationEnd() {
+        //TODO enable user interaction
+        _enableUserInteraction.value = Event(true)
+
+        //TODO THIS COMMENTED CODE ONLY FORE SWIPE GAME
+//        if (mCurrentPagerPlaces.value?.backPlace?.state == PlaceState.GAME_OVER_PLACE) {
+//            isGameOver = true
+//        }
+//        if (mCurrentPagerPlaces.value?.currentPlace?.state == PlaceState.GAME_WIN_PLACE) {
+//            isGameWin = true
+//        }
+//
+//        if (!isGameWin || isGameOver) {
+            if (!isGameOver) {//TODO mb move to on click
                 val passed = mPassedScaryPlaces.value ?: 0
                 mPassedScaryPlaces.value = passed + 1
                 mSelectedLevel.value?.nextLevelPlace()
@@ -116,30 +145,10 @@ class LevelsViewModel : ViewModel() {
 //        }
     }
 
-    fun onPlaceGoBackAnimationEnd() {
-        //TODO THIS COMMENTED CODE ONLY FORE SWIPE GAME
-//        if (mCurrentPagerPlaces.value?.backPlace?.state == PlaceState.GAME_OVER_PLACE) {
-//            isGameOver = true
-//        }
-//        if (mCurrentPagerPlaces.value?.currentPlace?.state == PlaceState.GAME_WIN_PLACE) {
-//            isGameWin = true
-//        }
-//
-//        if (!isGameWin || isGameOver) {
-            if (!isGameOver) {
-                val passed = mPassedScaryPlaces.value ?: 0
-                mPassedScaryPlaces.value = passed - 1
-                mSelectedLevel.value?.nextLevelPlace()
-            } else {
-                mSelectedLevel.value?.setGameOverPlaces()
-            }
-            mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
-//        } else {
-//            onGameEnd()
-//        }
-    }
-
     fun userClickGoAhead() {
+        //TODO disable user interaction
+//        _enableUserInteraction.value = Event(false)
+
         if (mCurrentPagerPlaces.value?.nextPlace?.state == PlaceState.GAME_OVER_PLACE) {
             isGameOver = true
         }
@@ -155,6 +164,9 @@ class LevelsViewModel : ViewModel() {
     }
 
     fun userClickGoBack() {
+        //TODO disable user interaction
+//        _enableUserInteraction.value = Event(false)
+
         if (mCurrentPagerPlaces.value?.backPlace?.state == PlaceState.GAME_OVER_PLACE) {
             isGameOver = true
         }

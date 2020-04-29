@@ -17,6 +17,7 @@ import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.base.BaseFragment
 import com.tilseier.escapethemonster.models.Level
 import com.tilseier.escapethemonster.screens.LevelsViewModel
+import com.tilseier.escapethemonster.views.transformations.PlaceTransformation
 import kotlinx.android.synthetic.main.fragment_game.*
 
 
@@ -31,6 +32,12 @@ class GameFragment : BaseFragment() {
 
     //TODO fix problem with slider images
 
+    companion object {
+        //TODO appropriate count of milliseconds//AppConstants.PAGER_TRANSITION_DURATION_MS
+        private const val MOVE_BACK_DURATION: Long = 500//1000
+        private const val MOVE_AHEAD_DURATION: Long = 1000//1000
+    }
+
     private var mLevelsViewModel: LevelsViewModel? = null
 
     private var handler = Handler()
@@ -40,7 +47,7 @@ class GameFragment : BaseFragment() {
     private lateinit var placeCurrent: PlaceFragment
     private lateinit var placeForward: PlaceFragment
 
-    private var doSetupLevel = true
+//    private var doSetupLevel = true
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_game
@@ -79,73 +86,76 @@ class GameFragment : BaseFragment() {
         })
         mLevelsViewModel?.goAhead()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "goAhead: $it")
-            it.getEventIfNotHandled()?.let{
-                animatePlacePagerTransition(true)
+            it.getEventIfNotHandled()?.let {
+                animatePlacePagerTransition(true)//go ahead
             }
         })
         mLevelsViewModel?.goBack()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "goAhead: $it")
-            it.getEventIfNotHandled()?.let{
-                animatePlacePagerTransition(false)
+            it.getEventIfNotHandled()?.let {
+                animatePlacePagerTransition(false)//go back
+            }
+        })
+        mLevelsViewModel?.enableUserInteraction()?.observe(viewLifecycleOwner, Observer {
+            Log.e("GameFragment", "goAhead: $it")
+            it.getEventIfNotHandled()?.let {
+                if (it) {
+                    enableUserInteraction()
+                } else {
+                    disableUserInteraction()
+                }
             }
         })
         mLevelsViewModel?.navigateToGameEnd()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "goAhead: $it")
-            it.getEventIfNotHandled()?.let{
+            it.getEventIfNotHandled()?.let {
                 navController.navigate(R.id.action_gameFragment_to_gameOverFragment)
             }
         })
-
-//        mLevelsViewModel?.getPagerPlaces()?.observe(viewLifecycleOwner, Observer {
-//            Log.e("GameFragment", "getPagerPlaces: $it")
-//            updatePagerPlaces(it)
-//        })
-
-//        mLevelsViewModel?.getPagerPlaces()?.observe(viewLifecycleOwner, Observer {
-//            Log.e("GameFragment", "backPlace?.imageUrl: ${it.backPlace?.imageUrl}")
-//            Log.e("GameFragment", "currentPlace?.imageUrl: ${it.currentPlace?.imageUrl}")
-//            Log.e("GameFragment", "nextPlace?.imageUrl: ${it.nextPlace?.imageUrl}")
-////            setupLevel(level)
-////            setupPagerPlaces()
-////            mLevelsViewModel?.startGame()
-//        })
 
         btn_back.setOnClickListener {
             navController.popBackStack()
         }
         btn_place_ahead.setOnClickListener {
+            Log.e("btn_place_ahead", "CLICK")
+            disableUserInteraction()
             mLevelsViewModel?.userClickGoAhead()
 //            vp_places.setCurrentItem(vp_places.currentItem + 1, true);
         }
         btn_place_back.setOnClickListener {
+            Log.e("btn_place_back", "CLICK")
+            disableUserInteraction()
             mLevelsViewModel?.userClickGoBack()
 //            vp_places.setCurrentItem(vp_places.currentItem - 1, true);
         }
     }
 
+    private fun enableUserInteraction() {
+        btn_place_ahead.isEnabled = true
+        btn_place_back.isEnabled = true
+    }
+
+    private fun disableUserInteraction() {
+        btn_place_ahead.isEnabled = false
+        btn_place_back.isEnabled = false
+    }
+
     private fun setupLevel(level: Level?) {
-        doSetupLevel = false
+//        doSetupLevel = false
         setupPagerPlaces(level)
         level_progress?.max = level?.scaryPlaces?.size ?: 0
-//        level_progress.progress = level?.passedScaryPlaces ?: 0//TODO
     }
 
     private fun setupPagerPlaces(level: Level?) {
-        //pagerPlaces: PagerPlaces
-
-        //TODO
         val placesFragments: MutableList<Fragment> = mutableListOf()
 
-//        val _place3 = PlaceFragment.newInstance()
         placeCurrent = PlaceFragment.newInstance(CURRENT_PLACE)
         placeBack = PlaceFragment.newInstance(BACK_PLACE)
         placeForward = PlaceFragment.newInstance(NEXT_PLACE)
-//        val _place1 = PlaceFragment.newInstance()
-//        placesFragments.add(_place3)
+
         placesFragments.add(placeBack)
         placesFragments.add(placeCurrent)
         placesFragments.add(placeForward)
-//        placesFragments.add(_place1)
 
         val levelsPagerAdapter: FragmentPagerAdapter =
             PlacePagerAdapter(childFragmentManager, placesFragments)
@@ -153,12 +163,18 @@ class GameFragment : BaseFragment() {
         vp_places?.adapter = levelsPagerAdapter
         vp_places?.currentItem = 1
 
+        val placeTransformation = PlaceTransformation()
+        vp_places?.setPageTransformer(true, placeTransformation)
+
 //        vp_places.addOnPageChangeListener(PlacePageListener())
 
         vp_places?.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageSelected(position: Int) {
                 Log.e("GameFragment", "onPageSelected position: $position")
-                Log.e("GameFragment", "onPageSelected vp_places.isFakeDragging: ${vp_places.isFakeDragging}")
+                Log.e(
+                    "GameFragment",
+                    "onPageSelected vp_places.isFakeDragging: ${vp_places.isFakeDragging}"
+                )
                 if (position == 0 || position == 2) {
                     handler.postDelayed({
                         if (position == 0) {
@@ -167,7 +183,7 @@ class GameFragment : BaseFragment() {
                             mLevelsViewModel?.onPlaceGoAheadAnimationEnd()
                         }
                         vp_places?.setCurrentItem(1, false)
-                    }, 100)//TODO appropriate count of milliseconds
+                    }, 100)//TODO appropriate count of milliseconds //mb 500
                 }
 
 //                if (position == 0) {
@@ -180,7 +196,13 @@ class GameFragment : BaseFragment() {
 ////                    handler.postDelayed({ vp_places.setCurrentItem(1, false) }, 500)
 //                }
             }
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+            }
 
             override fun onPageScrollStateChanged(state: Int) {
 //                if (state == ViewPager.SCROLL_STATE_IDLE) {
@@ -213,7 +235,10 @@ class GameFragment : BaseFragment() {
     }
 
     private fun animatePlacePagerTransition(forward: Boolean) {
-        Log.e("GameFragment", "animatePagerTransition vp_places.isFakeDragging: ${vp_places.isFakeDragging}")
+        Log.e(
+            "GameFragment",
+            "animatePagerTransition vp_places.isFakeDragging: ${vp_places.isFakeDragging}"
+        )
         if (!vp_places.isFakeDragging) {
             val animator = ValueAnimator.ofInt(
                 0,
@@ -239,31 +264,18 @@ class GameFragment : BaseFragment() {
                     val dragOffset = dragPosition - oldDragPosition
                     oldDragPosition = dragPosition
                     if (vp_places != null) {
-                        if (vp_places.isFakeDragging || vp_places.beginFakeDrag()) {
+                        if (vp_places.isFakeDragging) {//|| vp_places.beginFakeDrag()
                             vp_places.fakeDragBy((dragOffset * if (forward) -1 else 1).toFloat())
                         }
                     }
                 }
             })
-            animator.duration = 1000//TODO appropriate count of milliseconds//AppConstants.PAGER_TRANSITION_DURATION_MS
+            animator.duration = if (forward) MOVE_AHEAD_DURATION else Companion.MOVE_BACK_DURATION
 
             vp_places?.beginFakeDrag()
             animator.start()
         }
     }
-
-//    private fun updatePagerPlaces(pagerPlaces: PagerPlaces) {
-        //TODO
-////        placeCurrent.setPlace(pagerPlaces.currentPlace)
-////        placeBack.setPlace(pagerPlaces.backPlace)
-////        placeForward.setPlace(pagerPlaces.nextPlace)
-//
-//        placeCurrent = PlaceFragment.newInstance(pagerPlaces.currentPlace?.imageUrl)
-//        placeBack = PlaceFragment.newInstance(pagerPlaces.backPlace?.imageUrl)
-//        placeForward = PlaceFragment.newInstance(pagerPlaces.nextPlace?.imageUrl)
-//
-//        vp_places.adapter?.notifyDataSetChanged()
-//    }
 
 //    private class PlacePageListener : ViewPager.OnPageChangeListener {
 //        override fun onPageScrollStateChanged(p0: Int) {

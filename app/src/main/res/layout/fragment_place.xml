@@ -4,22 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
     tools:context=".screens.menu.MenuFragment">
 
-    <!-- TODO ImageView-->
     <ImageView
         android:id="@+id/iv_place"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_arrow_back"/>
-
-    <ImageView
-        android:id="@+id/iv_preload_place"
-        android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_arrow_back"/>
+        android:scaleType="fitCenter"/>
 
 </FrameLayout>
