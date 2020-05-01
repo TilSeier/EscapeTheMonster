@@ -15,4 +15,7 @@
     <color name="btn_go_back_disabled">#acafb0</color>
     <color name="btn_go_ahead_enabled">#03DAC5</color>
     <color name="btn_go_ahead_disabled">#acafb0</color>
+
+    <color name="time_line_active">#fc8f00</color>
+    <color name="time_line_passive">#acafb0</color>
 </resources>

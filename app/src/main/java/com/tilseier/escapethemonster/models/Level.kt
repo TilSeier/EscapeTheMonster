@@ -1,5 +1,6 @@
 package com.tilseier.escapethemonster.models
 
+import com.tilseier.escapethemonster.models.Place.Companion.INFINITE_TIME
 import java.util.*
 
 //TODO stars for level //achieve star1, star2, star3 position
@@ -19,24 +20,38 @@ data class Level(
         levelPlaces.clear()
         levelPlaces.addAll(safePlaces)
         levelPlaces.addAll(scaryPlaces)
-        levelPlaces.add(Place("", false, PlaceState.GAME_WIN_PLACE))
+        levelPlaces.add(Place("", false, 3000, PlaceState.GAME_WIN_PLACE))
 
 //        passedScaryPlaces = 0
 
-        nextLevelPlace()
+        nextLevelPlaces()
     }
 
-    fun nextLevelPlace() {
+    fun nextLevelPlaces() {
         //TODO logic
 
         val currentPlace = levelPlaces.poll()
-        val backPlace = if (currentPlace?.isMonster == true) levelPlaces.peek() else Place("", true, PlaceState.GAME_OVER_PLACE)
-        val nextPlace = if (currentPlace?.isMonster == false) levelPlaces.peek() else Place("", true, PlaceState.GAME_OVER_PLACE)
+        val backPlace = if (currentPlace?.isMonster == true) levelPlaces.peek() else Place(
+            "",
+            true,
+            INFINITE_TIME,
+            PlaceState.GAME_OVER_PLACE
+        )
+        val nextPlace = if (currentPlace?.isMonster == false) levelPlaces.peek() else Place(
+            "",
+            true,
+            INFINITE_TIME,
+            PlaceState.GAME_OVER_PLACE
+        )
         currentPagerPlaces = PagerPlaces(backPlace, currentPlace, nextPlace)
     }
 
     fun setGameOverPlaces() {
-        currentPagerPlaces = PagerPlaces(Place("", true, PlaceState.GAME_OVER_PLACE), Place("", true, PlaceState.GAME_OVER_PLACE), Place("", true, PlaceState.GAME_OVER_PLACE))
+        currentPagerPlaces = PagerPlaces(
+            Place("", true, INFINITE_TIME, PlaceState.GAME_OVER_PLACE),
+            Place("", true, INFINITE_TIME, PlaceState.GAME_OVER_PLACE),
+            Place("", true, INFINITE_TIME, PlaceState.GAME_OVER_PLACE)
+        )
     }
 
 }

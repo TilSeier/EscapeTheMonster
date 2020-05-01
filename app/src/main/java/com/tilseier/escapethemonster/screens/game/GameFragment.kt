@@ -16,16 +16,18 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.base.BaseFragment
 import com.tilseier.escapethemonster.models.Level
+import com.tilseier.escapethemonster.models.Place
 import com.tilseier.escapethemonster.screens.LevelsViewModel
 import com.tilseier.escapethemonster.views.transformations.PlaceTransformation
 import kotlinx.android.synthetic.main.fragment_game.*
+import java.text.DecimalFormatSymbols
 
 
 class GameFragment : BaseFragment() {
 
     //TODO preload all place images before start level +-
 
-    //TODO view pager transformation
+    //TODO view pager transformation +
     //TODO progress with achievements// stars for level //achieve star1, star2, star3 position in Level model
     //TODO timer for places (true/false or float milliseconds) in Place model
     //TODO progress enhance
@@ -34,7 +36,7 @@ class GameFragment : BaseFragment() {
 
     companion object {
         //TODO appropriate count of milliseconds//AppConstants.PAGER_TRANSITION_DURATION_MS
-        private const val MOVE_BACK_DURATION: Long = 500//1000
+        private const val MOVE_BACK_DURATION: Long = 600//1000
         private const val MOVE_AHEAD_DURATION: Long = 1000//1000
     }
 
@@ -46,6 +48,8 @@ class GameFragment : BaseFragment() {
     private lateinit var placeBack: PlaceFragment
     private lateinit var placeCurrent: PlaceFragment
     private lateinit var placeForward: PlaceFragment
+
+//    private var maxProgress: Long = 100
 
 //    private var doSetupLevel = true
 
@@ -83,6 +87,17 @@ class GameFragment : BaseFragment() {
         mLevelsViewModel?.getPassedScaryPlaces()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "PassedScaryPlaces: $it")
             level_progress?.progress = it
+        })
+        mLevelsViewModel?.getMaxTime()?.observe(viewLifecycleOwner, Observer {
+            Log.e("GameFragment", "getPlaceMilliseconds: $it")
+            val maxProgress = if (it != Place.INFINITE_TIME) it.toInt() else 100
+            time_line?.max = maxProgress
+            time_line?.secondaryProgress = maxProgress
+        })
+        mLevelsViewModel?.getTimeLeft()?.observe(viewLifecycleOwner, Observer {
+//            Log.e("GameFragment", "getPlaceMilliseconds: $it maxProgress: $maxProgress and ${((it.toFloat() / maxProgress) * 100)}")
+            time_line?.progress = if (it != Place.INFINITE_TIME) it.toInt() else 100
+            tv_seconds?.text = if (it != Place.INFINITE_TIME) ((it+999) / 1000).toInt().toString() else DecimalFormatSymbols.getInstance().infinity
         })
         mLevelsViewModel?.goAhead()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "goAhead: $it")

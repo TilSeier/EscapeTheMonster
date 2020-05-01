@@ -3,10 +3,13 @@ package com.tilseier.escapethemonster.screens
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import androidx.lifecycle.ViewModelProvider
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.base.BaseActivity
 
 class MainActivity : BaseActivity() {
+
+    private var mLevelsViewModel: LevelsViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -19,7 +22,8 @@ class MainActivity : BaseActivity() {
         )
         setContentView(R.layout.activity_main)
 
-        //TODO fragments navigation
+        mLevelsViewModel = ViewModelProvider(this).get(LevelsViewModel::class.java)
+        mLevelsViewModel?.let { lifecycle.addObserver(it) }
 
     }
 }
