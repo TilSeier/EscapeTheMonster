@@ -4,6 +4,7 @@ import android.app.Application
 import com.tilseier.escapethemonster.di.components.ApplicationComponent
 import com.tilseier.escapethemonster.di.components.DaggerApplicationComponent
 import com.tilseier.escapethemonster.di.modules.ApplicationModule
+import com.tilseier.escapethemonster.di.modules.DatabaseModule
 
 class Application: Application() {
 
@@ -17,6 +18,7 @@ class Application: Application() {
     private fun initializeInjector() {
         applicationComponent = DaggerApplicationComponent.builder()
             .applicationModule(ApplicationModule(this))
+            .databaseModule(DatabaseModule(this))
             .build()
     }
 

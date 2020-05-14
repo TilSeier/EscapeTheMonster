@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".screens.menu.MenuFragment">
+    tools:context="com.tilseier.escapethemonster.ui.screen.menu.MenuFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -69,7 +69,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <com.tilseier.escapethemonster.views.PlacesViewPager
+        <com.tilseier.escapethemonster.ui.screen.game.widget.PlacesViewPager
             android:id="@+id/vp_places"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -79,7 +79,7 @@
         <TextView
             android:id="@+id/btn_place_back"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="80dp"
             android:text="GO BACK"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="10dp"
@@ -96,7 +96,7 @@
         <TextView
             android:id="@+id/btn_place_ahead"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="80dp"
             android:text="GO AHEAD"
             android:layout_marginStart="5dp"
             android:layout_marginBottom="10dp"
@@ -110,5 +110,19 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/screamer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/screamer_1" />
 
 </FrameLayout>

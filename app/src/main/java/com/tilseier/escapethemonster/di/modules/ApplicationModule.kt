@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.tilseier.escapethemonster.Application
 import com.tilseier.escapethemonster.R
+import com.tilseier.escapethemonster.di.ApplicationContext
 import com.tilseier.escapethemonster.utils.helper.shared.SharedPreferencesHelper
 import com.tilseier.escapethemonster.utils.helper.shared.SharedPreferencesHelperImpl
 import dagger.Module
@@ -14,6 +15,13 @@ import javax.inject.Singleton
 
 @Module
 class ApplicationModule constructor(val application: Application) {
+
+    @Singleton
+    @Provides
+    @ApplicationContext
+    fun provideContext(): Context {
+        return application
+    }
 
     @Provides
     @Singleton

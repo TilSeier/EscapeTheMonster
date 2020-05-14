@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingStart="15dp"
     android:paddingEnd="15dp"
-    tools:context=".screens.menu.MenuFragment">
+    tools:context="com.tilseier.escapethemonster.ui.screen.menu.MenuFragment">
 
     <ImageView
         android:id="@+id/iv_place"

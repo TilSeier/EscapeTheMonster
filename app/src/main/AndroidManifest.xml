@@ -16,10 +16,10 @@
         android:theme="@style/AppTheme">
         <!--TODO REMOVE SPLASH-->
         <activity
-            android:name=".screens.SplashActivity"
+            android:name="com.tilseier.escapethemonster.ui.screen.SplashActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".screens.MainActivity"
+            android:name="com.tilseier.escapethemonster.ui.screen.MainActivity"
             android:theme="@style/SplashTheme"
             android:launchMode="singleTask"
             android:screenOrientation="fullSensor">
