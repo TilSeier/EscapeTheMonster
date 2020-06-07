@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
-import com.tilseier.escapethemonster.data.model.Level
+import com.tilseier.escapethemonster.data.database.Level
 import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import com.tilseier.escapethemonster.ui.screen.game.widget.transformations.PlaceTransformation

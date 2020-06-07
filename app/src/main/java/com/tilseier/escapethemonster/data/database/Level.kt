@@ -1,24 +1,21 @@
 package com.tilseier.escapethemonster.data.database
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.tilseier.escapethemonster.data.DataConverter
+import com.tilseier.escapethemonster.data.model.PagerPlaces
 import com.tilseier.escapethemonster.data.model.Place
+import com.tilseier.escapethemonster.data.model.Place.Companion.INFINITE_TIME
+import com.tilseier.escapethemonster.data.model.PlaceState
+import java.util.*
 
-
+//TODO stars for level //achieve star1, star2, star3 position
 @Entity(tableName = "levels")
 class Level {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     var id: Int = 0
 
     var level: String = ""
-
-    var locked: Boolean = true
-
-    var stars: Int = 0
 
     @ColumnInfo(name = "safe_places")
     @TypeConverters(DataConverter::class)
@@ -27,5 +24,17 @@ class Level {
     @ColumnInfo(name = "scary_places")
     @TypeConverters(DataConverter::class)
     var scaryPlaces: List<Place>? = null
+
+    var locked: Boolean = true
+
+    var stars: Int = 0
+
+    //TODO remove locked and stars to not change it when update level
+    constructor(id: Int, level: String, safePlaces: List<Place>?, scaryPlaces: List<Place>?) {//, locked: Boolean, stars: Int
+        this.id = id
+        this.level = level
+        this.safePlaces = safePlaces
+        this.scaryPlaces = scaryPlaces
+    }
 
 }

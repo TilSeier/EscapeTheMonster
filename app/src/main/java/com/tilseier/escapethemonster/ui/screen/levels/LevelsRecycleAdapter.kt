@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tilseier.escapethemonster.R
-import com.tilseier.escapethemonster.data.model.Level
+import com.tilseier.escapethemonster.data.database.Level
 import kotlinx.android.synthetic.main.level_item.view.*
 
 class LevelsRecycleAdapter constructor(var levels: List<Level>) :
@@ -49,7 +49,7 @@ class LevelsRecycleAdapter constructor(var levels: List<Level>) :
 
         fun bind(images: Level) {
             itemView.tv_level.text = images.level.toString()
-            itemView.tv_count_of_places.text = images.safePlaces.size.toString() + " Pl"
+            itemView.tv_count_of_places.text = images.safePlaces?.size.toString() + " Pl"
             itemView.tv_stars.text = images.stars.toString() + " Stars"
             itemView.tv_locked.text = if (images.locked) "LOCKED" else "OPENED"
         }

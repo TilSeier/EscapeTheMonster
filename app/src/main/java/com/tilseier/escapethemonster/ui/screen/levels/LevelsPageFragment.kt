@@ -9,7 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
-import com.tilseier.escapethemonster.data.model.Level
+import com.tilseier.escapethemonster.data.database.Level
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import kotlinx.android.synthetic.main.fragment_levels_page.*
 

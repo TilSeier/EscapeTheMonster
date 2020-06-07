@@ -1,17 +1,23 @@
 package com.tilseier.escapethemonster.ui.screen
 
+import android.app.Application
 import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.*
-import com.tilseier.escapethemonster.data.model.Level
+import com.tilseier.escapethemonster.data.database.AppDatabase
+import com.tilseier.escapethemonster.data.database.Level
 import com.tilseier.escapethemonster.data.model.PagerPlaces
+import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.data.model.Place.Companion.INFINITE_TIME
 import com.tilseier.escapethemonster.data.model.PlaceState
 import com.tilseier.escapethemonster.repository.LevelsRepository
 import com.tilseier.escapethemonster.utils.Event
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.*
 
 
-class LevelsViewModel : ViewModel(), LifecycleObserver {
+class LevelsViewModel(application: Application) : AndroidViewModel(application), LifecycleObserver {
 
     //LiveData - can't be changed directly, only observed
     //MutableLiveData - can be changed and observed
@@ -23,13 +29,12 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
     }
 
     //Levels
-    private var mLevels: MutableLiveData<List<Level>>? = null
-    private var mLevelsPages: MutableLiveData<List<List<Level>>>? = null
+    private var mLevels: LiveData<List<Level>>? = null
     private var mRepo: LevelsRepository? = null
 
     //Events
     private var _navigateToLevel: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
-    private var _prepareLevelImages: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
+    private var _userClickOnLevel: MutableLiveData<Event<Level>> = MutableLiveData<Event<Level>>()
     private var _navigateToGameEnd: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goAhead: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
     private var _goBack: MutableLiveData<Event<Boolean>> = MutableLiveData<Event<Boolean>>()
@@ -39,46 +44,55 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
     //Game Level
     private var mSelectedLevel: MutableLiveData<Level> = MutableLiveData<Level>()
     private var mPassedScaryPlaces: MutableLiveData<Int> = MutableLiveData<Int>()
-//    private var mLevelPlaces: Queue<Place> = LinkedList()
-
-    //    private var mCurrentPlace: Queue<Place>? = null
+    private var mLevelPlacesQueue: Queue<Place> = LinkedList()
     private var mCurrentPagerPlaces: MutableLiveData<PagerPlaces> = MutableLiveData<PagerPlaces>()
     private var mTimeLeft: MutableLiveData<Long> = MutableLiveData<Long>()
     private var mMaxTime: MutableLiveData<Long> = MutableLiveData<Long>()
     private var mMoveBackDuration: MutableLiveData<Long> = MutableLiveData<Long>()
     private var mMoveAheadDuration: MutableLiveData<Long> = MutableLiveData<Long>()
 
+    //Timer
     private var countDownTimer: CountDownTimer? = null
 
+    //Game state
     private var isGameOver = false
     private var isGameWin = false
 
     init {
         if (mLevels == null) {
-            Log.e("LevelsViewModel", "INIT")
+            val levelsDao = AppDatabase.getDatabase(application, viewModelScope).levelsDao()
             mRepo =
-                LevelsRepository.newInstance()
+                LevelsRepository.newInstance(levelsDao)
             mLevels = mRepo?.getLevels()
-            mLevelsPages = mRepo?.getLevelsPages()
+
 //            mSelectedLevel = mRepo?.getSelectedLevel()//TODO
         }
+    }
+
+    /**
+     * Launching a new coroutine to insert the data in a non-blocking way
+     */
+    fun insert(level: Level) = viewModelScope.launch(Dispatchers.IO) {
+        mRepo?.insert(level)
     }
 
     //Levels
     fun getLevels(): LiveData<List<Level>>? = mLevels
 
-    fun getLevelsPages(): LiveData<List<List<Level>>>? = mLevelsPages
-
     fun getSelectedLevel(): LiveData<Level> = mSelectedLevel
 
     fun getPassedScaryPlaces(): LiveData<Int> = mPassedScaryPlaces
+
+    fun setSelectedLevel(level: Level?) {
+        mSelectedLevel.value = level
+    }
 
     //Events
     fun navigateToLevel(): LiveData<Event<Level>> = _navigateToLevel
 
     fun navigateToGameEnd(): LiveData<Event<Boolean>> = _navigateToGameEnd
 
-    fun prepareLevelImages(): LiveData<Event<Level>> = _prepareLevelImages
+    fun userClickOnLevel(): LiveData<Event<Level>> = _userClickOnLevel
 
     fun goAhead(): LiveData<Event<Boolean>> = _goAhead
 
@@ -87,10 +101,6 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
     fun enableUserInteraction(): LiveData<Event<Boolean>> = _enableUserInteraction
 
     fun showScreamer(): LiveData<Event<Boolean>> = _showScreamer
-
-    fun setSelectedLevel(level: Level?) {
-        mSelectedLevel.value = level
-    }
 
     //Game Level
     fun getPagerPlaces(): LiveData<PagerPlaces> = mCurrentPagerPlaces
@@ -107,17 +117,14 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
         isGameOver = false
         isGameWin = false
 
-        mSelectedLevel.value?.startLevel()
-
-        mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
-        mPassedScaryPlaces.value = 0// mSelectedLevel.value?.passedScaryPlaces
+        startLevel()
 
         mMoveAheadDuration.value = MOVE_AHEAD_DURATION
         mMoveBackDuration.value = MOVE_BACK_DURATION
 
         stopTimer()
-        mTimeLeft.value = INFINITE_TIME//TODO check
-        mMaxTime.value = INFINITE_TIME//TODO check
+        mTimeLeft.value = INFINITE_TIME
+        mMaxTime.value = INFINITE_TIME
 
     }
 
@@ -135,19 +142,18 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
 //
 //        if (!isGameWin || isGameOver) {
         if (!isGameOver) {//TODO mb move to on click
-            mSelectedLevel.value?.nextLevelPlaces()
+            nextLevelPlaces()
 
-            mMaxTime.value = mSelectedLevel.value?.currentPagerPlaces?.currentPlace?.milliseconds ?: INFINITE_TIME
+            mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
             mTimeLeft.value = mMaxTime.value
             startTimer(mTimeLeft.value ?: INFINITE_TIME)
 
         } else {
-            mSelectedLevel.value?.setGameOverPlaces()
+            setGameOverPlaces()
 
             //TODO if screamer is allowed than show screamer else onGameEnd
             _showScreamer.value = Event(true)
         }
-        mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
 //        } else {
 //            onGameEnd()
 //        }
@@ -169,19 +175,18 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
         if (!isGameOver) {//TODO mb move to on click
             val passed = mPassedScaryPlaces.value ?: 0
             mPassedScaryPlaces.value = passed + 1
-            mSelectedLevel.value?.nextLevelPlaces()
+            nextLevelPlaces()
 
-            mMaxTime.value = mSelectedLevel.value?.currentPagerPlaces?.currentPlace?.milliseconds ?: INFINITE_TIME
+            mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
             mTimeLeft.value = mMaxTime.value
             startTimer(mTimeLeft.value ?: INFINITE_TIME)
 
         } else {
-            mSelectedLevel.value?.setGameOverPlaces()
+            setGameOverPlaces()
 
             //TODO if screamer is allowed than show screamer else onGameEnd
             _showScreamer.value = Event(true)
         }
-        mCurrentPagerPlaces.value = mSelectedLevel.value?.currentPagerPlaces
 //        } else {
 //            onGameEnd()
 //        }
@@ -233,13 +238,81 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
         }
     }
 
+    //game controls
+    private fun startLevel() {
+        //TODO shuffle mechanism
+        mLevelPlacesQueue.clear()
+        mSelectedLevel.value?.safePlaces?.let { mLevelPlacesQueue.addAll(it) }
+        mSelectedLevel.value?.scaryPlaces?.let { mLevelPlacesQueue.addAll(it) }
+        mLevelPlacesQueue.add(
+            Place(
+                "",
+                false,
+                3000,
+                PlaceState.GAME_WIN_PLACE
+            )
+        )
+
+        mPassedScaryPlaces.value = 0
+
+        nextLevelPlaces()
+    }
+
+    private fun nextLevelPlaces() {
+        //TODO logic
+
+        val currentPlace = mLevelPlacesQueue.poll()
+        val backPlace = if (currentPlace?.isMonster == true) mLevelPlacesQueue.peek() else Place(
+            "",
+            true,
+            INFINITE_TIME,
+            PlaceState.GAME_OVER_PLACE
+        )
+        val nextPlace = if (currentPlace?.isMonster == false) mLevelPlacesQueue.peek() else Place(
+            "",
+            true,
+            INFINITE_TIME,
+            PlaceState.GAME_OVER_PLACE
+        )
+        mCurrentPagerPlaces.value =
+            PagerPlaces(
+                backPlace,
+                currentPlace,
+                nextPlace
+            )
+    }
+
+    private fun setGameOverPlaces() {
+        mCurrentPagerPlaces.value =
+            PagerPlaces(
+                Place(
+                    "",
+                    true,
+                    INFINITE_TIME,
+                    PlaceState.GAME_OVER_PLACE
+                ),
+                Place(
+                    "",
+                    true,
+                    INFINITE_TIME,
+                    PlaceState.GAME_OVER_PLACE
+                ),
+                Place(
+                    "",
+                    true,
+                    INFINITE_TIME,
+                    PlaceState.GAME_OVER_PLACE
+                )
+            )
+    }
+
     //Events
     fun onLevelImagesReady(level: Level) {
         _navigateToLevel.value = Event(level)
     }
 
     fun userClickOnLevel(level: Level) {
-        _prepareLevelImages.value = Event(level)
+        _userClickOnLevel.value = Event(level)
     }
 
     fun onScreamerEnd() {
@@ -288,24 +361,14 @@ class LevelsViewModel : ViewModel(), LifecycleObserver {
         countDownTimer?.cancel()
     }
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-//    fun onAny(source: LifecycleOwner?, event: Lifecycle.Event?) {
-//        Log.e("LevelsViewModel", "ON_ANY: ${event?.name}")
-//    }
-//
-
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
         Log.e("LevelsViewModel", "ON_RESUME")
-
-
-//        startTimer(mTimeLeft.value ?: INFINITE_TIME)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onPause() {
         Log.e("LevelsViewModel", "ON_PAUSE")
-//        stopTimer()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)

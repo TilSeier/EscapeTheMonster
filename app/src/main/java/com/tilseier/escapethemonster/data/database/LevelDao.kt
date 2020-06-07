@@ -1,9 +1,7 @@
 package com.tilseier.escapethemonster.data.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.lifecycle.LiveData
+import androidx.room.*
 
 
 @Dao
@@ -23,14 +21,14 @@ interface LevelDao {
 //    @Insert
 //    fun addLevels(vararg levels: Level?)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addLevels(levels: List<Level>)
 
     @Query("SELECT * FROM levels WHERE id = :id")
     fun getLevel(id: Int): Level?
 
     @Query("SELECT * FROM levels")
-    fun getLevels(): List<Level>?
+    fun getLevels(): LiveData<List<Level>>
 
     @Query("DELETE FROM levels")//TODO mb we don't need this
     fun deleteAllLevels()
@@ -40,6 +38,16 @@ interface LevelDao {
 
     @Query("UPDATE levels SET locked = :locked WHERE id = :id")
     fun updateLevelLocked(id: Int, locked: Boolean)
+
+//    @Update
+//    fun update(levels: List<Level>)
+//
+//    @Transaction
+//    fun addOrLevels(entity: Pin) {
+//        if (insertIgnore(entity) == -1L) {
+//            update(entity)
+//        }
+//    }
 
 
 //    @get:Query("select * from favourite_web ORDER BY id DESC")

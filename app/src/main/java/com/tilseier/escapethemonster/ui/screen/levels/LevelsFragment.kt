@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
@@ -13,9 +14,10 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.gson.Gson
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
-import com.tilseier.escapethemonster.data.model.Level
+import com.tilseier.escapethemonster.data.database.Level
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import kotlinx.android.synthetic.main.fragment_levels.*
 
@@ -31,7 +33,6 @@ class LevelsFragment : BaseFragment() {
     }
 
     private var mLevelsViewModel: LevelsViewModel? = null
-//    private var handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +44,22 @@ class LevelsFragment : BaseFragment() {
 
         prepareViewsVisibility()
 
-        mLevelsViewModel?.getLevelsPages()?.observe(viewLifecycleOwner, Observer {
-            Log.e("LevelsFragment", "LEVEL PAGES: ${it?.size}")
+        mLevelsViewModel?.getLevels()?.observe(viewLifecycleOwner, Observer { levels ->
+            Log.e("LevelsFragment", "LEVELS: ${levels?.size}")
+            if (levels.isNotEmpty()) {
+                Log.e("LevelsFragment", "LEVEL 1: ${Gson().toJson(levels[0])}")
+            }
+            //prepare levels pages
+            val levelsPages: MutableList<List<Level>> = mutableListOf()
+            levelsPages.clear()
+            //TODO SEPARATE ON PAGES PROPERLY
+            if (levels.size >= 9) {
+                levels?.subList(0, 9)?.let { levelsPages.add(it) }
+            }
+            Log.e("LevelsFragment", "LEVEL PAGES: ${levelsPages.size}")
             //setup levels
-            setupLevels(it)
+            setupLevels(levelsPages)
         })
-
-//        observe(viewLifecycleOwner
 
         mLevelsViewModel?.navigateToLevel()?.observe(viewLifecycleOwner, Observer {
             // Only proceed if the event has never been handled
@@ -59,10 +69,14 @@ class LevelsFragment : BaseFragment() {
                 navController.navigate(R.id.action_levelsFragment_to_gameFragment)
             }
         })
-        mLevelsViewModel?.prepareLevelImages()?.observe(viewLifecycleOwner, Observer {
+        mLevelsViewModel?.userClickOnLevel()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "goAhead: $it")
             it.getEventIfNotHandled()?.let{
-                preloadLevelImages(it)
+                if (it.locked) {
+                    Toast.makeText(context, "Level is locked!", Toast.LENGTH_SHORT).show()
+                } else {
+                    preloadLevelImages(it)
+                }
             }
         })
 //        mLevelsViewModel?.let { lifecycle.addObserver(it) }//TODO DECIDE DO WE NEED IT? //CAUSE ERROR Android lifecycle library: Cannot add the same observer with different lifecycles GameFragment: 32
@@ -170,7 +184,7 @@ class LevelsFragment : BaseFragment() {
     private fun setupLevels(levels: List<List<Level>>) {
         val levelsFragments: MutableList<Fragment> = mutableListOf()
         levels.forEach {
-            val levelsPage = LevelsPageFragment.newInstance(it)//, lvlListener
+            val levelsPage = LevelsPageFragment.newInstance(it)
             levelsFragments.add(levelsPage)
         }
         val levelsPagerAdapter: FragmentPagerAdapter =
