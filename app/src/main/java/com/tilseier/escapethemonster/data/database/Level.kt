@@ -2,6 +2,7 @@ package com.tilseier.escapethemonster.data.database
 
 import androidx.room.*
 import com.tilseier.escapethemonster.data.DataConverter
+import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.PagerPlaces
 import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.data.model.Place.Companion.INFINITE_TIME
@@ -25,16 +26,25 @@ class Level {
     @TypeConverters(DataConverter::class)
     var scaryPlaces: List<Place>? = null
 
+    @ColumnInfo(name = "achievements")
+    @TypeConverters(DataConverter::class)
+    var achievements: Achievements = Achievements(Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION)
+
     var locked: Boolean = true
 
     var stars: Int = 0
 
     //TODO remove locked and stars to not change it when update level
-    constructor(id: Int, level: String, safePlaces: List<Place>?, scaryPlaces: List<Place>?) {//, locked: Boolean, stars: Int
+    constructor(id: Int,
+                level: String,
+                safePlaces: List<Place>?,
+                scaryPlaces: List<Place>?,
+                achievements: Achievements = Achievements(Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION)) {//, locked: Boolean, stars: Int
         this.id = id
         this.level = level
         this.safePlaces = safePlaces
         this.scaryPlaces = scaryPlaces
+        this.achievements = achievements
     }
 
 }

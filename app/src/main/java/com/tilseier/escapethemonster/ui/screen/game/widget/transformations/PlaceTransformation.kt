@@ -10,8 +10,6 @@ class PlaceTransformation : PageTransformer {
         position: Float
     ) {
 
-        Log.e("PlaceTransformation", "position: $position")
-
         page.translationX = -position * page.width
         page.alpha = 1 - Math.abs(position)
 

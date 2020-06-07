@@ -7,6 +7,7 @@
     tools:context="com.tilseier.escapethemonster.ui.screen.menu.MenuFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/game_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -68,6 +69,21 @@
             app:layout_constraintTop_toBottomOf="@+id/btn_back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.tilseier.achievementsforprogressbar.AchievementsForProgressBar
+            android:id="@+id/level_achievements"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:psv_count_of_stars="3"
+            app:psv_star1_progress="2"
+            app:psv_star2_progress="5"
+            app:psv_star3_progress="9"
+            app:psv_stars_src="@drawable/star"
+            app:psv_stars_size="23dp"
+            app:psv_parent="@+id/game_wrapper"
+            app:psv_progress_bar="@+id/level_progress"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <com.tilseier.escapethemonster.ui.screen.game.widget.PlacesViewPager
             android:id="@+id/vp_places"

@@ -7,8 +7,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -187,7 +190,7 @@ class LevelsFragment : BaseFragment() {
             val levelsPage = LevelsPageFragment.newInstance(it)
             levelsFragments.add(levelsPage)
         }
-        val levelsPagerAdapter: FragmentPagerAdapter =
+        val levelsPagerAdapter: FragmentStatePagerAdapter =
             LevelsPagerAdapter(childFragmentManager, levelsFragments)
         levels_pager.adapter = levelsPagerAdapter
         levels_dot_indicator.setViewPager(levels_pager)

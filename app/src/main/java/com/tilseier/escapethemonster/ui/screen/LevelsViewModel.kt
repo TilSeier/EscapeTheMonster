@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.tilseier.escapethemonster.data.database.AppDatabase
 import com.tilseier.escapethemonster.data.database.Level
+import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.PagerPlaces
 import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.data.model.Place.Companion.INFINITE_TIME
@@ -72,8 +73,20 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
-    fun insert(level: Level) = viewModelScope.launch(Dispatchers.IO) {
+    private fun insert(level: Level) = viewModelScope.launch(Dispatchers.IO) {
         mRepo?.insert(level)
+    }
+
+    private fun updateLevelStars(id: Int, stars: Int) = viewModelScope.launch(Dispatchers.IO) {
+        mRepo?.updateLevelStars(id, stars)
+    }
+
+    private fun updateLevelLock(id: Int, locked: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        mRepo?.updateLevelLock(id, locked)
+    }
+
+    private fun updateLevel(level: Level) = viewModelScope.launch(Dispatchers.IO) {
+        mRepo?.updateLevel(level)
     }
 
     //Levels
@@ -85,6 +98,10 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 
     fun setSelectedLevel(level: Level?) {
         mSelectedLevel.value = level
+    }
+
+    fun setSelectedLevelAchievements(achievements: Achievements) {
+        mSelectedLevel.value?.achievements = achievements
     }
 
     //Events
@@ -320,7 +337,67 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     }
 
     private fun onGameEnd() {//level: Level//TODO
+        Log.e("LevelsViewModel", "onGameEnd")
+
+        updateCurrentLevel()
+
         _navigateToGameEnd.value = Event(true)
+    }
+
+    private fun updateCurrentLevel() {
+        var countOfAchievements = 0
+        val countOfCurrentLevelAchievements = mSelectedLevel.value?.stars ?: 0
+
+        val passedScaryPlaces = mPassedScaryPlaces.value ?: 0
+        val achievementPosition1 = mSelectedLevel.value?.achievements?.achievementPosition1
+            ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        val achievementPosition2 = mSelectedLevel.value?.achievements?.achievementPosition2
+            ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        val achievementPosition3 = mSelectedLevel.value?.achievements?.achievementPosition3
+            ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        if (achievementPosition1 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
+            && passedScaryPlaces >= achievementPosition1
+        ) {
+            countOfAchievements++
+        }
+        if (achievementPosition2 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
+            && passedScaryPlaces >= achievementPosition2
+        ) {
+            countOfAchievements++
+        }
+        if (achievementPosition3 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
+            && passedScaryPlaces >= achievementPosition3
+        ) {
+            countOfAchievements++
+        }
+
+        Log.e("LevelsViewModel", "countOfAchievements = $countOfAchievements")
+        Log.e("LevelsViewModel", "countOfCurrentLevelAchievements = $countOfCurrentLevelAchievements")
+
+        if (countOfAchievements > countOfCurrentLevelAchievements) {
+            //todo update level stars, unlock next level
+            val currentLevelId = mSelectedLevel.value?.id ?: -1
+            val countOfLevels = mLevels?.value?.size ?: 0
+            val nextLevelId = if (currentLevelId + 1 <= countOfLevels) currentLevelId + 1 else -1
+            if (currentLevelId != -1) {
+                updateLevelStars(currentLevelId, countOfAchievements)
+
+//                val updatedLevel = Level(currentLevelId)
+//                updatedLevel.stars = countOfAchievements
+//                mSelectedLevel.value?.stars = countOfAchievements
+//                updateLevel(mSelectedLevel.value)
+            }
+            if (nextLevelId != -1) {
+                updateLevelLock(nextLevelId, false)
+
+//                val updatedLevel = Level(nextLevelId)
+//                updatedLevel.locked = false
+//                updateLevel(updatedLevel)
+            }
+            Log.e("LevelsViewModel", "countOfLevels = $countOfLevels")
+            Log.e("LevelsViewModel", "currentLevelId = $currentLevelId")
+            Log.e("LevelsViewModel", "nextLevelId = $nextLevelId")
+        }
     }
 
     private fun startTimer(milliseconds: Long) {//TODO counter

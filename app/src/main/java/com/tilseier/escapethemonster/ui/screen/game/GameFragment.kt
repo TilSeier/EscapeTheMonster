@@ -15,9 +15,11 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
+import com.tilseier.achievementsforprogressbar.AchievementsForProgressBar
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
 import com.tilseier.escapethemonster.data.database.Level
+import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import com.tilseier.escapethemonster.ui.screen.game.widget.transformations.PlaceTransformation
@@ -87,6 +89,7 @@ class GameFragment : BaseFragment() {
         mLevelsViewModel?.getPassedScaryPlaces()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "PassedScaryPlaces: $it")
             level_progress?.progress = it
+            level_achievements?.setProgress(it)//TODO check
         })
         mLevelsViewModel?.getMaxTime()?.observe(viewLifecycleOwner, Observer {
             Log.e("GameFragment", "getPlaceMilliseconds: $it")
@@ -150,6 +153,13 @@ class GameFragment : BaseFragment() {
             mLevelsViewModel?.userClickGoBack()
 //            vp_places.setCurrentItem(vp_places.currentItem - 1, true);
         }
+
+        //achievements listener
+//        level_achievements?.setListener(object: AchievementsForProgressBar.OnAchievedListener{
+//            override fun onAchieved(countOfStars: Int) {
+//
+//            }
+//        })
     }
 
     private fun showScreamer() {
@@ -189,7 +199,36 @@ class GameFragment : BaseFragment() {
     private fun setupLevel(level: Level?) {
 //        doSetupLevel = false
         setupPagerPlaces()
-        level_progress?.max = level?.scaryPlaces?.size ?: 0
+        val countOfScaryPlaces = level?.scaryPlaces?.size ?: 0
+        level_progress?.max = countOfScaryPlaces
+        setupAchievements(level)
+    }
+
+    private fun setupAchievements(level: Level?) {
+        val maxAchievementProgress = level?.scaryPlaces?.size ?: 0
+
+        val achievements: Achievements = Achievements(
+            (maxAchievementProgress/1.66f).toInt(),
+            (maxAchievementProgress/1.33f).toInt(),
+            maxAchievementProgress)
+
+        val defAchievementPosition1 = (maxAchievementProgress/1.66f).toInt()
+        val defAchievementPosition2 = (maxAchievementProgress/1.33f).toInt()
+        val defAchievementPosition3 = maxAchievementProgress
+
+        achievements.achievementPosition1 = level?.achievements?.achievementPosition1 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        achievements.achievementPosition2 = level?.achievements?.achievementPosition2 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        achievements.achievementPosition3 = level?.achievements?.achievementPosition3 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+
+        achievements.achievementPosition1 = if(achievements.achievementPosition1 <= maxAchievementProgress && achievements.achievementPosition1 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition1 else defAchievementPosition1
+        achievements.achievementPosition2 = if(achievements.achievementPosition2 <= maxAchievementProgress && achievements.achievementPosition2 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition2 else defAchievementPosition2
+        achievements.achievementPosition3 = if(achievements.achievementPosition3 <= maxAchievementProgress && achievements.achievementPosition3 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition3 else defAchievementPosition3
+
+        level_achievements?.setAchievement1Progress(achievements.achievementPosition1)
+        level_achievements?.setAchievement2Progress(achievements.achievementPosition2)
+        level_achievements?.setAchievement3Progress(achievements.achievementPosition3)
+
+        mLevelsViewModel?.setSelectedLevelAchievements(achievements)
     }
 
     private fun setupPagerPlaces() {
@@ -293,11 +332,15 @@ class GameFragment : BaseFragment() {
             animator.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {}
                 override fun onAnimationEnd(animation: Animator?) {
-                    vp_places?.endFakeDrag()
+                    if (vp_places != null && vp_places.isFakeDragging) {//TODO check
+                        vp_places?.endFakeDrag()
+                    }
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
-                    vp_places?.endFakeDrag()
+                    if (vp_places != null && vp_places.isFakeDragging) {//TODO check
+                        vp_places?.endFakeDrag()
+                    }
                 }
 
                 override fun onAnimationRepeat(animation: Animator?) {}

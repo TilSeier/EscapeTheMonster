@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 // Annotates class to be a Room Database with a table (entity) of the Level class
 @Database(
     entities = [Level::class],
@@ -47,7 +48,8 @@ abstract class AppDatabase : RoomDatabase() {
 
             val levels: List<Level> = HardcodedLevels.getAllLevels()
 
-            levelDao.addLevels(levels)
+//            levelDao.addLevels(levels)
+            levelDao.addOrUpdateLevels(levels)
 
             Log.e("TAG_DATABASE", "onCreate 3 CREATE_DATABASE")
 
@@ -70,49 +72,31 @@ abstract class AppDatabase : RoomDatabase() {
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
                 Log.e("TAG_DATABASE", "getDatabase 1 CREATE_DATABASE")
-                val instance = Room
-                    .databaseBuilder(
+                val instance = Room.databaseBuilder(
                         context.applicationContext,
                         AppDatabase::class.java,
                         DBName
                     )
                     .addCallback(AppDatabaseCallback(scope))//TODO https://stackoverflow.com/questions/47619718/room-database-not-created/47619844#47619844
+//                    .addMigrations(MIGRATION_1_2)//migration if needed
+//                    .fallbackToDestructiveMigration()//instead of migration, but database will be recreated and all data lost
                     .build()
                 INSTANCE = instance
                 // return instance
                 instance
             }
         }
-    }
 
-
-
-
-
-//    companion object {
-//        // Singleton prevents multiple instances of database opening at the
-//        // same time.
-//        @Volatile
-//        private var INSTANCE: AppDatabase? = null
-//
-//        val DBName = "escape_the_monster.db"
-//
-//        fun getDatabase(context: Context): AppDatabase {
-//            val tempInstance = INSTANCE
-//            if (tempInstance != null) {
-//                return tempInstance
-//            }
-//            synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    AppDatabase::class.java,
-//                    DBName
-//                ).build()
-//                INSTANCE = instance
-//                return instance
+        //magrations
+//        val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+//            override fun migrate(database: SupportSQLiteDatabase) {
+//                // Since we didn't alter the table, there's nothing else to do here.
+//                database.execSQL("ALTER TABLE levels "
+//                        + " ADD COLUMN achievements TEXT")
 //            }
 //        }
-//    }
+
+    }
 
 }
 //TODO don't provide now, but use INSTANCE https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin/#8

@@ -2,6 +2,7 @@ package com.tilseier.escapethemonster.data.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.google.gson.Gson
 
 
 @Dao
@@ -21,7 +22,7 @@ interface LevelDao {
 //    @Insert
 //    fun addLevels(vararg levels: Level?)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert//(onConflict = OnConflictStrategy.REPLACE)
     fun addLevels(levels: List<Level>)
 
     @Query("SELECT * FROM levels WHERE id = :id")
@@ -37,17 +38,57 @@ interface LevelDao {
     fun updateLevelStars(id: Int, countOfStars: Int)
 
     @Query("UPDATE levels SET locked = :locked WHERE id = :id")
-    fun updateLevelLocked(id: Int, locked: Boolean)
+    fun updateLevelLock(id: Int, locked: Boolean)
 
 //    @Update
 //    fun update(levels: List<Level>)
 //
-//    @Transaction
-//    fun addOrLevels(entity: Pin) {
-//        if (insertIgnore(entity) == -1L) {
-//            update(entity)
-//        }
-//    }
+
+//    @Insert(onConflict = OnConflictStrategy.IGNORE)
+//    fun addLevelsIgnore(levels: List<Level>): Long
+
+    @Update
+    fun updateLevel(level: Level)
+
+//    @Insert(onConflict = OnConflictStrategy.IGNORE)
+//    fun addLevelIgnore(levels: Level): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun addLevelIgnore(level: Level) : Long
+
+    @Update
+    fun updateLevel(levels: List<Level>)
+
+    //(onConflict = OnConflictStrategy.REPLACE)
+//    @Update
+//    fun updateLevels(levels: List<Level>)
+
+    @Query("UPDATE levels SET level = :level, safe_places = :safePlaces, scary_places = :scaryPlaces, achievements = :achievements WHERE id = :id")
+    fun updateLevel(id: Int, level: String, safePlaces: String, scaryPlaces: String, achievements: String)
+
+//    var level: String = ""
+//
+//    @ColumnInfo(name = "safe_places")
+//    @TypeConverters(DataConverter::class)
+//    var safePlaces: List<Place>? = null
+//
+//    @ColumnInfo(name = "scary_places")
+//    @TypeConverters(DataConverter::class)
+//    var scaryPlaces: List<Place>? = null
+//
+//    @ColumnInfo(name = "achievements")
+//    @TypeConverters(DataConverter::class)
+//    var achievements
+
+    @Transaction
+    fun addOrUpdateLevels(levels: List<Level>) {
+        val gson = Gson()
+        for (level in levels) {
+            if (addLevelIgnore(level) == -1L) {
+                updateLevel(level.id, level.level, gson.toJson(level.safePlaces), gson.toJson(level.scaryPlaces), gson.toJson(level.achievements))
+            }
+        }
+    }
 
 
 //    @get:Query("select * from favourite_web ORDER BY id DESC")

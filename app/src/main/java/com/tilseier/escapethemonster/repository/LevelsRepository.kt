@@ -26,6 +26,18 @@ class LevelsRepository(private val levelDao: LevelDao) {
         levelDao.addLevel(level)
     }
 
+    suspend fun updateLevelStars(id: Int, stars: Int) {
+        levelDao.updateLevelStars(id, stars)
+    }
+
+    suspend fun updateLevelLock(id: Int, locked: Boolean) {
+        levelDao.updateLevelLock(id, locked)
+    }
+
+    suspend fun updateLevel(level: Level) {
+        levelDao.updateLevel(level)
+    }
+
     //Pretend to get data from a webservice or online source
     fun getLevels(): LiveData<List<Level>>? {
         return levels

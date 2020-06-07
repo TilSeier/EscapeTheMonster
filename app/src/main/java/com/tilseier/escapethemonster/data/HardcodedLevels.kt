@@ -1,12 +1,14 @@
 package com.tilseier.escapethemonster.data
 
 import com.tilseier.escapethemonster.data.database.Level
+import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.Place
 
 class HardcodedLevels {
 
     companion object {
 
+        //TODO update database only if version has changed
         val HARDCODED_LEVELS_VERSION = "1"
 
         fun getAllLevels(): List<Level> {
