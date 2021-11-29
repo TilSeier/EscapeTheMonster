@@ -6,12 +6,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager.widget.PagerAdapter
-import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -21,6 +18,7 @@ import com.google.gson.Gson
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
 import com.tilseier.escapethemonster.data.database.Level
+import com.tilseier.escapethemonster.ui.extensions.toPagesWithLevels
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import kotlinx.android.synthetic.main.fragment_levels.*
 
@@ -52,16 +50,7 @@ class LevelsFragment : BaseFragment() {
             if (levels.isNotEmpty()) {
                 Log.e("LevelsFragment", "LEVEL 1: ${Gson().toJson(levels[0])}")
             }
-            //prepare levels pages
-            val levelsPages: MutableList<List<Level>> = mutableListOf()
-            levelsPages.clear()
-            //TODO SEPARATE ON PAGES PROPERLY
-            if (levels.size >= 9) {
-                levels?.subList(0, 9)?.let { levelsPages.add(it) }
-            }
-            Log.e("LevelsFragment", "LEVEL PAGES: ${levelsPages.size}")
-            //setup levels
-            setupLevels(levelsPages)
+            setupLevels(levels.toPagesWithLevels(COUNT_OF_LEVELS_ON_PAGE))
         })
 
         mLevelsViewModel?.navigateToLevel()?.observe(viewLifecycleOwner, Observer {
@@ -85,7 +74,7 @@ class LevelsFragment : BaseFragment() {
 //        mLevelsViewModel?.let { lifecycle.addObserver(it) }//TODO DECIDE DO WE NEED IT? //CAUSE ERROR Android lifecycle library: Cannot add the same observer with different lifecycles GameFragment: 32
 
         btn_back.setOnClickListener {
-            navController.popBackStack();
+            navController.popBackStack()
         }
     }
 
@@ -196,4 +185,7 @@ class LevelsFragment : BaseFragment() {
         levels_dot_indicator.setViewPager(levels_pager)
     }
 
+    companion object {
+        const val COUNT_OF_LEVELS_ON_PAGE = 9
+    }
 }
