@@ -63,8 +63,8 @@ interface LevelDao {
 //    @Update
 //    fun updateLevels(levels: List<Level>)
 
-    @Query("UPDATE levels SET level = :level, safe_places = :safePlaces, scary_places = :scaryPlaces, achievements = :achievements WHERE id = :id")
-    fun updateLevel(id: Int, level: String, safePlaces: String, scaryPlaces: String, achievements: String)
+    @Query("UPDATE levels SET level = :level, seconds = :seconds, safe_places = :safePlaces, scary_places = :scaryPlaces, achievements = :achievements WHERE id = :id")
+    fun updateLevel(id: Int, level: String, seconds: Long, safePlaces: String, scaryPlaces: String, achievements: String)
 
 //    var level: String = ""
 //
@@ -85,7 +85,7 @@ interface LevelDao {
         val gson = Gson()
         for (level in levels) {
             if (addLevelIgnore(level) == -1L) {
-                updateLevel(level.id, level.level, gson.toJson(level.safePlaces), gson.toJson(level.scaryPlaces), gson.toJson(level.achievements))
+                updateLevel(level.id, level.level, level.seconds, gson.toJson(level.safePlaces), gson.toJson(level.scaryPlaces), gson.toJson(level.achievements))
             }
         }
     }

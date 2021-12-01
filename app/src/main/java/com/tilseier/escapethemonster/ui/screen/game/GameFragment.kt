@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
-import com.tilseier.escapethemonster.data.database.Level
 import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.Place
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
@@ -104,7 +103,7 @@ class GameFragment : BaseFragment() {
             time_line?.max = maxProgress
             time_line?.secondaryProgress = maxProgress
         })
-        mLevelsViewModel?.getTimeLeft()?.observe(viewLifecycleOwner, Observer {
+        mLevelsViewModel?.getLevelTimeLeft()?.observe(viewLifecycleOwner, Observer {
 //            Log.e("GameFragment", "getPlaceMilliseconds: $it maxProgress: $maxProgress and ${((it.toFloat() / maxProgress) * 100)}")
             time_line?.progress = if (it != Place.INFINITE_TIME) it?.toInt() ?: 100 else 100
             tv_seconds?.text = if (it != Place.INFINITE_TIME) ((it+999) / 1000).toInt().toString() else DecimalFormatSymbols.getInstance().infinity
@@ -342,6 +341,11 @@ class GameFragment : BaseFragment() {
             vp_places?.beginFakeDrag()
             animator.start()
         }
+    }
+
+    override fun onDestroyView() {
+        mLevelsViewModel?.onGameDestroyView();
+        super.onDestroyView()
     }
 
 //    private class PlacePageListener : ViewPager.OnPageChangeListener {

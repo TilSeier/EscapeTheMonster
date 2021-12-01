@@ -13,13 +13,19 @@ class HardcodedLevels {
 
         fun getAllLevels(): List<Level> {
 
-            val level1 = Level(1, "1", listOf(
-                Place(imageResource = R.drawable.test_road, count = 10),
-                Place(imageResource = R.drawable.test_road_2, count = 5),
-                Place(imageResource = R.drawable.test_road_3, count = 15)
-            ), listOf(
-                Place(imageResource = R.drawable.test_road_3, count = 15)
-            ))
+            val level1 = Level(
+                id = 1,
+                level = "1",
+                seconds = 20,
+                safePlaces = listOf(
+                    Place(imageResource = R.drawable.test_road, count = 10),
+                    Place(imageResource = R.drawable.test_road_2, count = 5),
+                    Place(imageResource = R.drawable.test_road_3, count = 15)
+                ),
+                scaryPlaces = listOf(
+                    Place(imageResource = R.drawable.test_road_3, count = 15)
+                )
+            )
             level1.locked = false
 
             return listOf(

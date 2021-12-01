@@ -36,14 +36,18 @@ class Level {
 
     var stars: Int = 0
 
+    var seconds: Long = 30
+
     //TODO remove locked and stars to not change it when update level
     constructor(id: Int,
                 level: String,
                 safePlaces: List<Place>?,
                 scaryPlaces: List<Place>?,
-                achievements: Achievements = Achievements(Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION)) {//, locked: Boolean, stars: Int
+                achievements: Achievements = Achievements(Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION, Achievements.DEFAULT_ACHIEVEMENT_POSITION),
+                seconds: Long = 30) {//, locked: Boolean, stars: Int
         this.id = id
         this.level = level
+        this.seconds = seconds
         this.safePlaces = safePlaces
         this.scaryPlaces = scaryPlaces
         this.achievements = achievements

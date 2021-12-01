@@ -49,8 +49,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     private var mLevelAchievements: MutableLiveData<Achievements> = MutableLiveData<Achievements>()
     private var mLevelPlacesQueue: Queue<Place> = LinkedList()
     private var mCurrentPagerPlaces: MutableLiveData<PagerPlaces> = MutableLiveData<PagerPlaces>()
-    private var mTimeLeft: MutableLiveData<Long> = MutableLiveData<Long>()
-    private var mMaxTime: MutableLiveData<Long> = MutableLiveData<Long>()
+    private var mLevelTimeLeft: MutableLiveData<Long> = MutableLiveData<Long>()
+    private var mLevelTime: MutableLiveData<Long> = MutableLiveData<Long>()
+    private var mLevelTimerIsRunning: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     private var mMoveBackDuration: MutableLiveData<Long> = MutableLiveData<Long>()
     private var mMoveAheadDuration: MutableLiveData<Long> = MutableLiveData<Long>()
 
@@ -124,9 +125,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     //Game Level
     fun getPagerPlaces(): LiveData<PagerPlaces> = mCurrentPagerPlaces
 
-    fun getTimeLeft(): LiveData<Long> = mTimeLeft
+    fun getLevelTimeLeft(): LiveData<Long> = mLevelTimeLeft
 
-    fun getMaxTime(): LiveData<Long> = mMaxTime
+    fun getMaxTime(): LiveData<Long> = mLevelTime
 
     fun getMoveBackDuration(): LiveData<Long> = mMoveBackDuration
 
@@ -144,8 +145,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         mMoveBackDuration.value = MOVE_BACK_DURATION
 
         stopTimer()
-        mTimeLeft.value = INFINITE_TIME
-        mMaxTime.value = INFINITE_TIME
+        val time = mSelectedLevel.value?.seconds?.times(1000)
+        mLevelTimeLeft.value = time
+        mLevelTime.value = time
 
     }
 
@@ -199,9 +201,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 
             nextLevelPlaces()
 
-            mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
-            mTimeLeft.value = mMaxTime.value
-            startTimer(mTimeLeft.value ?: INFINITE_TIME)
+//            mLevelTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
+//            mLevelTimeLeft.value = mLevelTime.value
+//            startTimer(mLevelTimeLeft.value ?: INFINITE_TIME)
 
         } else {
             setGameOverPlaces()
@@ -232,9 +234,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
             mPassedPlaces.value = passed + 1
             nextLevelPlaces()
 
-            mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
-            mTimeLeft.value = mMaxTime.value
-            startTimer(mTimeLeft.value ?: INFINITE_TIME)
+//            mLevelTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
+//            mLevelTimeLeft.value = mLevelTime.value
+//            startTimer(mLevelTimeLeft.value ?: INFINITE_TIME)
 
         } else {
             setGameOverPlaces()
@@ -251,7 +253,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         //TODO disable user interaction
         _enableUserInteraction.value = Event(false) // TODO maybe enable user interaction
 
-        stopTimer()
+        if (mLevelTimerIsRunning.value == false) {
+            startTimer(mSelectedLevel.value?.seconds?.times(1000) ?: INFINITE_TIME)
+        }
 
         if (mCurrentPagerPlaces.value?.nextPlace?.state == PlaceState.GAME_OVER_PLACE) {
             isGameOver = true
@@ -397,6 +401,7 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     private fun onGameEnd() {//level: Level//TODO
         Log.e("LevelsViewModel", "onGameEnd")
 
+        stopTimer()
         updateCurrentLevel()
 
         _navigateToGameEnd.value = Event(true)
@@ -463,37 +468,45 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
             stopTimer()
             countDownTimer = object : CountDownTimer(milliseconds, 50) {//TODO set proper countDownInterval
                 override fun onTick(millisUntilFinished: Long) {
+                    mLevelTimerIsRunning.value = true
                     Log.e("CountDownTimer", "seconds remaining: " + millisUntilFinished / 1000)
                     //here you can have your logic to set text to edittext
-                    mTimeLeft.value = millisUntilFinished
+                    mLevelTimeLeft.value = millisUntilFinished
                 }
 
                 override fun onFinish() {
+                    mLevelTimerIsRunning.value = false
                     Log.e("CountDownTimer", "DONE!")
-                    mTimeLeft.value = 0
+                    mLevelTimeLeft.value = 0
 
                     mMoveAheadDuration.value = SCREAMER_DURATION
                     mMoveBackDuration.value = SCREAMER_DURATION
 
                     //if screamer is allowed
-//                    _showScreamer.value = Event(true)
+                    _showScreamer.value = Event(true)
 
                     //if screamer is not allowed
-                    if (mCurrentPagerPlaces.value?.nextPlace?.state == PlaceState.GAME_OVER_PLACE) {
-                        userClickGoAhead()
-                    } else {
-                        userClickGoBack()
-                    }
-
+//                    if (mCurrentPagerPlaces.value?.nextPlace?.state == PlaceState.GAME_OVER_PLACE) {
+//                        userClickGoAhead()
+//                    } else {
+//                        userClickGoBack()
+//                    }
                 }
             }.start()
         } else {
-            mTimeLeft.value = INFINITE_TIME
+            mLevelTimeLeft.value = INFINITE_TIME
         }
     }
 
     private fun stopTimer() {
+        mLevelTimerIsRunning.value = false
         countDownTimer?.cancel()
+    }
+
+    fun onGameDestroyView() {
+        Log.e("LevelsViewModel", "ON_GAME_DESTROY_VIEW")
+        // TODO reset level if needed
+        stopTimer()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
