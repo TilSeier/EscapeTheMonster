@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingStart="15dp"
     android:paddingEnd="15dp"
     tools:context="com.tilseier.escapethemonster.ui.screen.menu.MenuFragment">
@@ -11,7 +11,37 @@
     <ImageView
         android:id="@+id/iv_place"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"/>
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/test_road"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <ImageView
+        android:id="@+id/iv_finish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:src="@drawable/test_finish"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_place"
+        app:layout_constraintEnd_toEndOf="@+id/iv_place"
+        app:layout_constraintStart_toStartOf="@+id/iv_place" />
+
+    <ImageView
+        android:id="@+id/iv_star"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="80dp"
+        android:layout_marginBottom="60dp"
+        android:src="@drawable/test_star"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_place"
+        app:layout_constraintEnd_toEndOf="@+id/iv_place"
+        app:layout_constraintStart_toStartOf="@+id/iv_place"
+        app:layout_constraintTop_toTopOf="@+id/iv_place" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

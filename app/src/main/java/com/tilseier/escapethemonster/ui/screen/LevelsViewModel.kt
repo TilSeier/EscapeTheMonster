@@ -24,8 +24,8 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     //MutableLiveData - can be changed and observed
 
     companion object {
-        private const val MOVE_BACK_DURATION: Long = 600
-        private const val MOVE_AHEAD_DURATION: Long = 1000
+        private const val MOVE_BACK_DURATION: Long = 300
+        private const val MOVE_AHEAD_DURATION: Long = 250 // TODO maybe change to 0 and make road as a gif animation
         private const val SCREAMER_DURATION: Long = 150
     }
 
@@ -44,7 +44,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 
     //Game Level
     private var mSelectedLevel: MutableLiveData<Level> = MutableLiveData<Level>()
-    private var mPassedScaryPlaces: MutableLiveData<Int> = MutableLiveData<Int>()
+    private var mPassedPlaces: MutableLiveData<Int> = MutableLiveData<Int>()
+    private var mCountOfPlaces: MutableLiveData<Int> = MutableLiveData<Int>()
+    private var mLevelAchievements: MutableLiveData<Achievements> = MutableLiveData<Achievements>()
     private var mLevelPlacesQueue: Queue<Place> = LinkedList()
     private var mCurrentPagerPlaces: MutableLiveData<PagerPlaces> = MutableLiveData<PagerPlaces>()
     private var mTimeLeft: MutableLiveData<Long> = MutableLiveData<Long>()
@@ -94,14 +96,14 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 
     fun getSelectedLevel(): LiveData<Level> = mSelectedLevel
 
-    fun getPassedScaryPlaces(): LiveData<Int> = mPassedScaryPlaces
+    fun getLevelAchievements(): LiveData<Achievements> = mLevelAchievements
+
+    fun getPassedPlaces(): LiveData<Int> = mPassedPlaces
+
+    fun getCountOfPlaces(): LiveData<Int> = mCountOfPlaces
 
     fun setSelectedLevel(level: Level?) {
         mSelectedLevel.value = level
-    }
-
-    fun setSelectedLevelAchievements(achievements: Achievements) {
-        mSelectedLevel.value?.achievements = achievements
     }
 
     //Events
@@ -134,7 +136,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         isGameOver = false
         isGameWin = false
 
-        startLevel()
+        prepareLevelCountOfPlaces()
+        prepareLevelAchievements()
+        prepareLevel()
 
         mMoveAheadDuration.value = MOVE_AHEAD_DURATION
         mMoveBackDuration.value = MOVE_BACK_DURATION
@@ -143,6 +147,37 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         mTimeLeft.value = INFINITE_TIME
         mMaxTime.value = INFINITE_TIME
 
+    }
+
+    private fun prepareLevelCountOfPlaces() {
+        var countOfPlaces = 0
+        mSelectedLevel.value?.safePlaces?.forEach {
+            countOfPlaces += it.count
+        }
+        mCountOfPlaces.value = countOfPlaces
+    }
+
+    private fun prepareLevelAchievements() {
+        val maxAchievementProgress = mCountOfPlaces.value ?: 0 // level?.scaryPlaces?.size ?: 0
+
+        val achievements: Achievements = Achievements(
+            (maxAchievementProgress/1.66f).toInt(),
+            (maxAchievementProgress/1.33f).toInt(),
+            maxAchievementProgress)
+
+        val defAchievementPosition1 = (maxAchievementProgress/1.66f).toInt()
+        val defAchievementPosition2 = (maxAchievementProgress/1.33f).toInt()
+        val defAchievementPosition3 = maxAchievementProgress
+
+        achievements.achievementPosition1 = mSelectedLevel.value?.achievements?.achievementPosition1 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        achievements.achievementPosition2 = mSelectedLevel.value?.achievements?.achievementPosition2 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+        achievements.achievementPosition3 = mSelectedLevel.value?.achievements?.achievementPosition3 ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
+
+        achievements.achievementPosition1 = if(achievements.achievementPosition1 <= maxAchievementProgress && achievements.achievementPosition1 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition1 else defAchievementPosition1
+        achievements.achievementPosition2 = if(achievements.achievementPosition2 <= maxAchievementProgress && achievements.achievementPosition2 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition2 else defAchievementPosition2
+        achievements.achievementPosition3 = if(achievements.achievementPosition3 <= maxAchievementProgress && achievements.achievementPosition3 != Achievements.DEFAULT_ACHIEVEMENT_POSITION) achievements.achievementPosition3 else defAchievementPosition3
+
+        mLevelAchievements.value = achievements
     }
 
     fun onPlaceGoAheadAnimationEnd() {
@@ -159,6 +194,9 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 //
 //        if (!isGameWin || isGameOver) {
         if (!isGameOver) {//TODO mb move to on click
+            val passed = mPassedPlaces.value ?: 0
+            mPassedPlaces.value = passed + 1
+
             nextLevelPlaces()
 
             mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
@@ -190,8 +228,8 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 //
 //        if (!isGameWin || isGameOver) {
         if (!isGameOver) {//TODO mb move to on click
-            val passed = mPassedScaryPlaces.value ?: 0
-            mPassedScaryPlaces.value = passed + 1
+            val passed = mPassedPlaces.value ?: 0
+            mPassedPlaces.value = passed + 1
             nextLevelPlaces()
 
             mMaxTime.value = mCurrentPagerPlaces.value?.currentPlace?.milliseconds ?: INFINITE_TIME
@@ -211,7 +249,7 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
 
     fun userClickGoAhead() {
         //TODO disable user interaction
-        _enableUserInteraction.value = Event(false)
+        _enableUserInteraction.value = Event(false) // TODO maybe enable user interaction
 
         stopTimer()
 
@@ -256,21 +294,38 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
     }
 
     //game controls
-    private fun startLevel() {
+    private fun prepareLevel() {
         //TODO shuffle mechanism
         mLevelPlacesQueue.clear()
-        mSelectedLevel.value?.safePlaces?.let { mLevelPlacesQueue.addAll(it) }
-        mSelectedLevel.value?.scaryPlaces?.let { mLevelPlacesQueue.addAll(it) }
-        mLevelPlacesQueue.add(
-            Place(
-                "",
-                false,
-                3000,
-                PlaceState.GAME_WIN_PLACE
-            )
-        )
+        mSelectedLevel.value?.safePlaces?.let { listOfPlaces ->
+            var placeIndex = 0
+            val listOfAchievementsPlaces = listOf(mLevelAchievements.value?.achievementPosition1, mLevelAchievements.value?.achievementPosition2, mLevelAchievements.value?.achievementPosition3)
+            val listOfNearAchievementsPlaces = listOf(mLevelAchievements.value?.achievementPosition1?.minus(1), mLevelAchievements.value?.achievementPosition2?.minus(1), mLevelAchievements.value?.achievementPosition3?.minus(1))
+            val listOfFarFromAchievementsPlaces = listOf(mLevelAchievements.value?.achievementPosition1?.minus(2), mLevelAchievements.value?.achievementPosition2?.minus(2), mLevelAchievements.value?.achievementPosition3?.minus(2))
+            listOfPlaces.forEach { place ->
+                repeat(place.count) {
+                    placeIndex++
+                    when (placeIndex) {
+                        in listOfAchievementsPlaces -> {
+                            mLevelPlacesQueue.add(place.copy(state = PlaceState.REWARD_PLACE))
+                        }
+                        in listOfNearAchievementsPlaces -> {
+                            mLevelPlacesQueue.add(place.copy(state = PlaceState.NEAR_REWARD_PLACE))
+                        }
+                        in listOfFarFromAchievementsPlaces -> {
+                            mLevelPlacesQueue.add(place.copy(state = PlaceState.FAR_FROM_REWARD_PLACE))
+                        }
+                        else -> {
+                            mLevelPlacesQueue.add(place)
+                        }
+                    }
+                }
+            }
+        }
 
-        mPassedScaryPlaces.value = 0
+        val winPlace: Place = mLevelPlacesQueue.last().copy(state = PlaceState.GAME_WIN_PLACE)
+        mLevelPlacesQueue.add(winPlace)
+        mPassedPlaces.value = 0
 
         nextLevelPlaces()
     }
@@ -279,18 +334,21 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         //TODO logic
 
         val currentPlace = mLevelPlacesQueue.poll()
-        val backPlace = if (currentPlace?.isMonster == true) mLevelPlacesQueue.peek() else Place(
+        val backPlace = Place(
             "",
             true,
             INFINITE_TIME,
             PlaceState.GAME_OVER_PLACE
         )
-        val nextPlace = if (currentPlace?.isMonster == false) mLevelPlacesQueue.peek() else Place(
-            "",
-            true,
-            INFINITE_TIME,
-            PlaceState.GAME_OVER_PLACE
-        )
+        val nextPlace = mLevelPlacesQueue.peek()
+
+        Log.e("SQUID_TAG", "nextLevelPlaces: currentPlace?.imageResource = ${currentPlace?.imageResource}")
+        Log.e("SQUID_TAG", "nextLevelPlaces: currentPlace?.count = ${currentPlace?.count}")
+        Log.e("SQUID_TAG", "nextLevelPlaces: currentPlace?.state = ${currentPlace?.state}")
+        Log.e("SQUID_TAG", "nextLevelPlaces: nextPlace?.imageResource = ${nextPlace?.imageResource}")
+        Log.e("SQUID_TAG", "nextLevelPlaces: nextPlace?.count = ${nextPlace?.count}")
+        Log.e("SQUID_TAG", "nextLevelPlaces: nextPlace?.state = ${nextPlace?.state}")
+
         mCurrentPagerPlaces.value =
             PagerPlaces(
                 backPlace,
@@ -348,25 +406,25 @@ class LevelsViewModel(application: Application) : AndroidViewModel(application),
         var countOfAchievements = 0
         val countOfCurrentLevelAchievements = mSelectedLevel.value?.stars ?: 0
 
-        val passedScaryPlaces = mPassedScaryPlaces.value ?: 0
-        val achievementPosition1 = mSelectedLevel.value?.achievements?.achievementPosition1
+        val passedPlaces = mPassedPlaces.value ?: 0
+        val achievementPosition1 = mLevelAchievements.value?.achievementPosition1
             ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
-        val achievementPosition2 = mSelectedLevel.value?.achievements?.achievementPosition2
+        val achievementPosition2 = mLevelAchievements.value?.achievementPosition2
             ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
-        val achievementPosition3 = mSelectedLevel.value?.achievements?.achievementPosition3
+        val achievementPosition3 = mLevelAchievements.value?.achievementPosition3
             ?: Achievements.DEFAULT_ACHIEVEMENT_POSITION
         if (achievementPosition1 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
-            && passedScaryPlaces >= achievementPosition1
+            && passedPlaces >= achievementPosition1
         ) {
             countOfAchievements++
         }
         if (achievementPosition2 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
-            && passedScaryPlaces >= achievementPosition2
+            && passedPlaces >= achievementPosition2
         ) {
             countOfAchievements++
         }
         if (achievementPosition3 != Achievements.DEFAULT_ACHIEVEMENT_POSITION
-            && passedScaryPlaces >= achievementPosition3
+            && passedPlaces >= achievementPosition3
         ) {
             countOfAchievements++
         }

@@ -18,6 +18,8 @@ class Level {
 
     var level: String = ""
 
+    // TODO properly add places variable
+
     @ColumnInfo(name = "safe_places")
     @TypeConverters(DataConverter::class)
     var safePlaces: List<Place>? = null

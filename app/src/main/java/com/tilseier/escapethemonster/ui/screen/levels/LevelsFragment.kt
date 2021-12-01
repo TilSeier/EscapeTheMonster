@@ -67,7 +67,7 @@ class LevelsFragment : BaseFragment() {
                 if (it.locked) {
                     Toast.makeText(context, "Level is locked!", Toast.LENGTH_SHORT).show()
                 } else {
-                    preloadLevelImages(it)
+                    mLevelsViewModel?.onLevelImagesReady(it)
                 }
             }
         })
@@ -82,7 +82,7 @@ class LevelsFragment : BaseFragment() {
         preload_level.visibility = View.GONE
     }
 
-    private fun preloadLevelImages(level: Level?){
+    private fun preloadLevelImages(level: Level?) {
         var isLevelReady = false
         var isPreloadFailed = false
         val maxProgress = (level?.scaryPlaces?.size ?: 0) + (level?.safePlaces?.size ?: 0)

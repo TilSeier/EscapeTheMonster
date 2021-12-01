@@ -1,7 +1,7 @@
 package com.tilseier.escapethemonster.data
 
+import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.data.database.Level
-import com.tilseier.escapethemonster.data.model.Achievements
 import com.tilseier.escapethemonster.data.model.Place
 
 class HardcodedLevels {
@@ -9,34 +9,16 @@ class HardcodedLevels {
     companion object {
 
         //TODO update database only if version has changed
-        val HARDCODED_LEVELS_VERSION = "1"
+        const val HARDCODED_LEVELS_VERSION = 1
 
         fun getAllLevels(): List<Level> {
 
             val level1 = Level(1, "1", listOf(
-                Place("https://i.picsum.photos/id/1/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/2/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/3/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/4/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/5/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/6/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/7/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/8/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/9/700/600.jpg", false),
-                Place("https://i.picsum.photos/id/10/700/600.jpg", false),
-                Place("https://www.recursografico.com/wp-content/uploads/2009/01/97442874_b06d05cc0e_b-400x300.jpg", false)
+                Place(imageResource = R.drawable.test_road, count = 10),
+                Place(imageResource = R.drawable.test_road_2, count = 5),
+                Place(imageResource = R.drawable.test_road_3, count = 15)
             ), listOf(
-                Place("https://s.4pda.to/1y0q6sA4dy7vULHZW9hRTmg40tVYeKQ9lkPk.png", true),
-                Place("https://i.picsum.photos/id/210/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/220/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/230/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/240/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/250/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/260/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/270/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/280/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/290/700/600.jpg", true),
-                Place("https://i.picsum.photos/id/300/700/600.jpg", true)
+                Place(imageResource = R.drawable.test_road_3, count = 15)
             ))
             level1.locked = false
 

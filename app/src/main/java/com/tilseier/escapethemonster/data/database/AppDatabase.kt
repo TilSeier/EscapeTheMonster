@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 // Annotates class to be a Room Database with a table (entity) of the Level class
 @Database(
     entities = [Level::class],
-    version = 1
+    version = HardcodedLevels.HARDCODED_LEVELS_VERSION
 ) //, exportSchema = false
 abstract class AppDatabase : RoomDatabase() {
 

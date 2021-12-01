@@ -10,6 +10,7 @@ import com.tilseier.escapethemonster.R
 import com.tilseier.escapethemonster.ui.base.BaseFragment
 import com.tilseier.escapethemonster.data.model.PagerPlaces
 import com.tilseier.escapethemonster.data.model.PlaceState
+import com.tilseier.escapethemonster.ui.extensions.px
 import com.tilseier.escapethemonster.ui.screen.LevelsViewModel
 import kotlinx.android.synthetic.main.fragment_place.*
 
@@ -64,36 +65,55 @@ class PlaceFragment : BaseFragment() {
     private fun updatePlace(pagerPlaces: PagerPlaces?) {
         when (placeStatus) {
             BACK_PLACE -> {
-                setPlace(pagerPlaces?.backPlace?.imageUrl, pagerPlaces?.backPlace?.state ?: PlaceState.PLACE)
+                setPlace(pagerPlaces?.backPlace?.imageResource, pagerPlaces?.backPlace?.imageUrl, pagerPlaces?.backPlace?.state ?: PlaceState.PLACE)
             }
             CURRENT_PLACE -> {
-                setPlace(pagerPlaces?.currentPlace?.imageUrl, pagerPlaces?.currentPlace?.state ?: PlaceState.PLACE)
+                setPlace(pagerPlaces?.currentPlace?.imageResource, pagerPlaces?.currentPlace?.imageUrl, pagerPlaces?.currentPlace?.state ?: PlaceState.PLACE)
             }
             NEXT_PLACE -> {
-                setPlace(pagerPlaces?.nextPlace?.imageUrl, pagerPlaces?.nextPlace?.state ?: PlaceState.PLACE)
+                setPlace(pagerPlaces?.nextPlace?.imageResource, pagerPlaces?.nextPlace?.imageUrl, pagerPlaces?.nextPlace?.state ?: PlaceState.PLACE)
             }
         }
     }
 
-    private fun setPlace(imageUrl: String?, placeState: PlaceState){
+    private fun setPlace(imageResource: Int?, imageUrl: String?, placeState: PlaceState){
+        Glide.with(requireContext())
+            .load(imageResource ?: imageUrl ?: R.drawable.test_road)
+            .into(iv_place)
         when (placeState) {
             PlaceState.PLACE -> {
-                imageUrl?.let {
-                    Glide.with(requireContext())
-                        .load(it)
-                        .into(iv_place)
-                }
+                iv_finish.visibility = View.GONE
+                iv_star.visibility = View.GONE
             }
             PlaceState.GAME_OVER_PLACE -> {
                 Glide.with(requireContext())
                     .load(R.drawable.img_screamer)
                     .into(iv_place)
+                iv_finish.visibility = View.GONE
+                iv_star.visibility = View.GONE
+            }
+            PlaceState.REWARD_PLACE -> {
+                iv_star.layoutParams.width = 200.px
+                iv_star.layoutParams.height = 200.px
+                iv_finish.visibility = View.GONE
+                iv_star.visibility = View.VISIBLE
+            }
+            PlaceState.NEAR_REWARD_PLACE -> {
+                iv_star.layoutParams.width = 120.px
+                iv_star.layoutParams.height = 120.px
+                iv_finish.visibility = View.GONE
+                iv_star.visibility = View.VISIBLE
+            }
+            PlaceState.FAR_FROM_REWARD_PLACE -> {
+                iv_star.layoutParams.width = 50.px
+                iv_star.layoutParams.height = 50.px
+                iv_finish.visibility = View.GONE
+                iv_star.visibility = View.VISIBLE
             }
             else -> {
                 //WIN PLACE
-                Glide.with(requireContext())
-                    .load(R.drawable.open_doors)
-                    .into(iv_place)
+                iv_finish.visibility = View.VISIBLE
+                iv_star.visibility = View.GONE
             }
         }
     }

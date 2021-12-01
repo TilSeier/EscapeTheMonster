@@ -4,8 +4,10 @@ package com.tilseier.escapethemonster.data.model
 data class Place (
     var imageUrl: String = "",
     var isMonster: Boolean = false,
-    var milliseconds: Long = 3000,//milliseconds
-    var state: PlaceState = PlaceState.PLACE
+    var milliseconds: Long = INFINITE_TIME, // 3000 //milliseconds
+    var state: PlaceState = PlaceState.PLACE,
+    var imageResource: Int? = null,
+    var count: Int = 1
 ) {
     companion object {
         const val INFINITE_TIME: Long = -1
